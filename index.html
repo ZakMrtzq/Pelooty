@@ -204,6 +204,7 @@
   .msg .mb{box-shadow:0 2px 8px rgba(0,0,0,.18)}
   .chatbar button{width:46px;height:46px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:18px;padding:0;border-radius:50%}
   .chatbar button:active{transform:scale(.92)}
+  .clockbar{text-align:center;font-size:12px;color:var(--muted);letter-spacing:.05em;padding:0 0 8px}
   #intro{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(120% 120% at 50% 45%,#241712 0%,var(--bg) 70%);pointer-events:none}
   #intro .peach{font-size:120px;will-change:transform,opacity;filter:drop-shadow(0 8px 30px rgba(255,133,103,.4))}
@@ -223,12 +224,13 @@
       </div>
     </div>
   </div>
+  <div class="clockbar"><span id="clockNow"></span></div>
   <div id="app"></div>
   <div class="foot" id="foot">Realtime &middot; changes sync live across devices</div>
   <div id="fx"></div>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
 const firebaseConfig = {
@@ -333,7 +335,7 @@ function renderHome(){
   });
   h+='</div>'+homeExtras()+'</div>';app.innerHTML=h;
   document.getElementById('signout').onclick=()=>signOut(auth);
-  {const cb=document.getElementById('calBtn');if(cb)cb.onclick=renderCalendar; const ch=document.getElementById('chatBtn');if(ch)ch.onclick=renderChat; const gb=document.getElementById('gamesBtn');if(gb)gb.onclick=renderGames;}
+  {const cb=document.getElementById('calBtn');if(cb)cb.onclick=renderCalendar; const ch=document.getElementById('chatBtn');if(ch)ch.onclick=renderChat; const gb=document.getElementById('gamesBtn');if(gb)gb.onclick=renderGames;} startClock();
   app.querySelectorAll('.day').forEach(b=>b.onclick=()=>openDay(+b.dataset.day));
   PROGRAM.forEach(day=>{
     const u=onSnapshot(dref(WEEK,day.id),snap=>{liveOn(true);
@@ -801,6 +803,9 @@ async function finishKegel(d){
   document.getElementById('kdone').onclick=renderKegel;
 }
 
+function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
+let clockStarted=false;
+function startClock(){ if(clockStarted)return; clockStarted=true; const tick=()=>{const el=document.getElementById('clockNow'); if(el)el.textContent=fmtNow();}; tick(); setInterval(tick,1000); }
 function esc(s){return (s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function setWeek(w){if(view.screen!=="home"&&view.screen!=="session")return;WEEK=Math.max(1,w);document.getElementById('wkNum').textContent=WEEK;setDoc(doc(db,'meta','app'),{week:WEEK},{merge:true}).catch(()=>{});if(view.screen==="home")renderHome();else openDay(view.dayId);}
 document.getElementById('wkUp').onclick=()=>setWeek(WEEK+1);
@@ -811,12 +816,22 @@ function handleErr(e){
     app.innerHTML='<div class="center"><h2>No access</h2><p>This account isn\u2019t on the allow-list. Ask the coach to add your email to the Firestore rules.</p><button class="gbtn" id="so2">Use a different account</button></div>';
     const b=document.getElementById('so2');if(b)b.onclick=()=>signOut(auth);}
 }
+const isMobile=/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+function doSignIn(){
+  if(isMobile){ signInWithRedirect(auth,provider); return; }
+  signInWithPopup(auth,provider).catch(e=>{
+    const c=e&&e.code||'';
+    if(c.indexOf('popup')>=0||c==='auth/operation-not-supported-in-this-environment'||c==='auth/cancelled-popup-request'){ signInWithRedirect(auth,provider); }
+    else alert(e.message||e);
+  });
+}
+getRedirectResult(auth).catch(e=>{ console.warn('redirect',e); if(e&&e.code==='auth/unauthorized-domain'){ alert('This site\u2019s web address isn\u2019t authorised in Firebase yet. Add it under Authentication \u2192 Settings \u2192 Authorized domains.'); } });
 function signInScreen(){
   document.getElementById('live').style.display='none';
   app.innerHTML='<div class="center"><h2>Pelooty 🍑</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
-  document.getElementById('gin').onclick=()=>signInWithPopup(auth,provider).catch(e=>alert(e.message));
+  document.getElementById('gin').onclick=doSignIn;
 }
-onAuthStateChanged(auth,async user=>{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; renderHome(); } else signInScreen(); });
+onAuthStateChanged(auth,async user=>{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); renderHome(); } else signInScreen(); });
 </script>
 </body>
 </html>
