@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
-<title>Training Logbook</title>
+<title>Pelooty</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%91%3C/text%3E%3C/svg%3E" />
 <style>
   :root{
@@ -14,7 +14,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{background:var(--bg);color:var(--ink);font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-feature-settings:"tnum" 1;}
-  body{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:40px;overflow-x:hidden}
+  body{max-width:520px;margin:0 auto;min-height:100vh;padding-bottom:40px;overflow-x:hidden;background:radial-gradient(120% 55% at 50% -8%,#271812 0%,var(--bg) 58%) no-repeat fixed}
   .num{font-variant-numeric:tabular-nums}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
   input,textarea{font-family:inherit;color:inherit}
@@ -33,14 +33,16 @@
   .wk .lab b{color:var(--ink)}
   .screen{padding:0 var(--pad);animation:fade .22s ease}
   @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-  @media (prefers-reduced-motion:reduce){.screen{animation:none}}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @media (prefers-reduced-motion:reduce){.screen{animation:none}.day,.ex,.gcard{animation:none!important}}
   .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin:6px 2px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
   .eyebrow .who{color:var(--muted);text-transform:none;letter-spacing:0;font-size:11px;white-space:nowrap}
   .eyebrow .who button{color:var(--accent);font-weight:600;margin-left:8px}
   .days{display:flex;flex-direction:column;gap:10px}
-  .day{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;transition:transform .12s,border-color .12s;width:100%}
+  .day{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;transition:transform .12s,border-color .12s;width:100%;animation:rise .45s ease backwards}
   .day:active{transform:scale(.985);border-color:var(--accent-dim)}
-  .day .ix{width:42px;height:42px;border-radius:12px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
+  .ring{width:48px;height:48px;border-radius:14px;flex:0 0 auto;padding:3px;background:conic-gradient(var(--accent) calc(var(--pct,0)*3.6deg),#3A2D26 0);transition:background .4s}
+  .day .ix{width:100%;height:100%;border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px}
   .t-hyp .ix{background:var(--accent-dim);color:var(--accent)}
   .t-neu .ix{background:#26402F;color:var(--done)}
   .t-rest .ix{background:#2A3340;color:#86B8E0}
@@ -59,7 +61,7 @@
   .shead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:2px 0 16px}
   .shead h2{font-size:22px;font-weight:800;letter-spacing:-.01em;line-height:1.1}
   .shead .date{font-size:12px;color:var(--muted);white-space:nowrap}
-  .ex{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+  .ex{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:12px;overflow:hidden;animation:rise .4s ease backwards}
   .ex .row{display:flex;align-items:center;gap:12px;padding:14px 16px;width:100%;text-align:left}
   .ex .nm{flex:1;min-width:0}
   .ex .nm .t{font-size:15px;font-weight:650;line-height:1.2}
@@ -126,6 +128,35 @@
   .gbtn svg{width:18px;height:18px}
   .setup{padding:30px var(--pad)}
   .foot{text-align:center;color:var(--muted);font-size:11px;margin-top:26px;line-height:1.6;opacity:.7}
+  .gcard{display:flex;align-items:center;gap:14px;width:100%;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;text-align:left;margin-top:10px;animation:rise .45s ease backwards;transition:transform .12s,border-color .12s}
+  .gcard:active{transform:scale(.985);border-color:var(--accent-dim)}
+  .gcard .gico{width:46px;height:46px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:24px;background:var(--card2);border-radius:13px}
+  .gcard .gtxt{flex:1;min-width:0}
+  .gcard .gt{font-size:15px;font-weight:700}
+  .gcard .gs{font-size:12px;color:var(--muted);margin-top:3px}
+  .gbar{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+  .gbar b{color:var(--ink);font-size:18px;font-weight:800;margin-left:4px}
+  .gamearea{position:relative;height:58vh;background:#1B1410;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+  .pp-peach{position:absolute;background:none;border:none;line-height:1;padding:0;filter:drop-shadow(0 4px 10px rgba(0,0,0,.4));cursor:pointer}
+  .pp-peach.gold{filter:drop-shadow(0 0 12px rgba(255,210,123,.8))}
+  .result{text-align:center;padding:24px 10px}
+  .result .rscore{font-size:54px;font-weight:800;color:var(--accent);line-height:1}
+  .result .rcap{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+  .lb{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:18px auto 0;max-width:320px;text-align:left}
+  .lb-h{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .lb-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
+  .lb-row b{color:var(--accent)}
+  .lb-empty{font-size:13px;color:var(--muted)}
+  .racts{display:flex;gap:8px;justify-content:center;margin-top:18px}
+  .racts button{padding:10px 20px;border-radius:12px;font-size:14px;font-weight:700}
+  .racts .save{background:var(--accent);color:#241008}
+  .racts .cancel{color:var(--muted)}
+  .rxn{width:100%;height:46vh;border-radius:var(--r);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;transition:background .1s}
+  .rxn.wait{background:#3A2D26;color:var(--muted)}
+  .rxn.go{background:var(--accent);color:#241008}
+  .rxn.early{background:#5A3A30;color:#FFB59B}
+  .rxn.done{background:var(--done-dim);color:#B9E8CC}
+  #rxn-lb{margin-top:16px}
   #intro{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(120% 120% at 50% 45%,#241712 0%,var(--bg) 70%);pointer-events:none}
   #intro .peach{font-size:120px;will-change:transform,opacity;filter:drop-shadow(0 8px 30px rgba(255,133,103,.4))}
@@ -135,7 +166,7 @@
 </head>
 <body>
   <div class="top">
-    <div class="brand"><div class="dot">&#127825;</div><h1>Logbook</h1></div>
+    <div class="brand"><div class="dot">&#127825;</div><h1>Pelooty</h1></div>
     <div style="display:flex;align-items:center;gap:12px">
       <div class="live" id="live"><span class="b"></span><span id="liveLbl">&hellip;</span></div>
       <div class="wk">
@@ -200,6 +231,8 @@ const PROGRAM = [
 
 const app=document.getElementById('app');
 const uid=()=>'x'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const EMOJIS=['\uD83C\uDF51','\uD83D\uDC18','\uD83D\uDC39'];
+const randEmoji=()=>EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
 
 if(firebaseConfig.apiKey.startsWith("PASTE")){
   document.getElementById('foot').style.display='none';
@@ -243,22 +276,24 @@ async function ensureDay(wk,id){
 }
 
 function renderHome(){
-  view={screen:"home",dayId:null};clearSubs();
+  view={screen:"home",dayId:null};clearSubs();clearGameTimers();
   const email=auth.currentUser?auth.currentUser.email:"";
   let h='<div class="screen"><div class="eyebrow"><span>Week '+WEEK+' &middot; pick a day</span><span class="who">'+esc(email)+'<button id="signout">Sign out</button></span></div><div class="days">';
-  PROGRAM.forEach(day=>{
+  PROGRAM.forEach((day,idx)=>{
     const t=day.type==="hyp"?"t-hyp":day.type==="neu"?"t-neu":"t-rest";
     const pill=day.type==="hyp"?'<span class="pill hyp">Hypertrophy</span>':day.type==="neu"?'<span class="pill neu">Neural</span>':'<span class="pill rest">Rest</span>';
-    h+='<button class="day '+t+'" data-day="'+day.id+'"><div class="ix">D'+day.id+'</div><div class="body"><div class="nm">'+esc(day.name)+'</div><div class="sub">'+pill+'<span id="ec-'+day.id+'">'+day.ex.length+' exercises</span></div></div><div class="meta"><div class="big num" id="dc-'+day.id+'">&middot;</div><div class="cap">at 100%</div></div><div class="chev">&rsaquo;</div></button>';
+    h+='<button class="day '+t+'" data-day="'+day.id+'" style="animation-delay:'+(idx*0.05)+'s"><div class="ring" id="ring-'+day.id+'" style="--pct:0"><div class="ix">D'+day.id+'</div></div><div class="body"><div class="nm">'+esc(day.name)+'</div><div class="sub">'+pill+'<span id="ec-'+day.id+'">'+day.ex.length+' exercises</span></div></div><div class="meta"><div class="big num" id="dc-'+day.id+'">&middot;</div><div class="cap">at 100%</div></div><div class="chev">&rsaquo;</div></button>';
   });
-  h+='</div></div>';app.innerHTML=h;
+  h+='</div>'+gamesCardHTML()+'</div>';app.innerHTML=h;
   document.getElementById('signout').onclick=()=>signOut(auth);
+  {const gb=document.getElementById('gamesBtn');if(gb)gb.onclick=renderGames;}
   app.querySelectorAll('.day').forEach(b=>b.onclick=()=>openDay(+b.dataset.day));
   PROGRAM.forEach(day=>{
     const u=onSnapshot(dref(WEEK,day.id),snap=>{liveOn(true);
       if(snap.exists()){const d=shape(day,snap.data());state[key(WEEK,day.id)]=d;
         const dc=document.getElementById('dc-'+day.id);if(dc)dc.textContent=doneCount(d)+"/"+d.exercises.length;
-        const ec=document.getElementById('ec-'+day.id);if(ec)ec.textContent=d.exercises.length+" exercises";}
+        const ec=document.getElementById('ec-'+day.id);if(ec)ec.textContent=d.exercises.length+" exercises";
+        const rg=document.getElementById('ring-'+day.id);if(rg)rg.style.setProperty('--pct',Math.round(doneCount(d)/Math.max(1,d.exercises.length)*100));}
       else{const dc=document.getElementById('dc-'+day.id);if(dc)dc.textContent="0/"+day.ex.length;}
     },err=>{liveOn(false);handleErr(err);});
     subs.push(u);
@@ -266,7 +301,7 @@ function renderHome(){
 }
 
 async function openDay(id){
-  view={screen:"session",dayId:id};clearSubs();renderedIds="";
+  view={screen:"session",dayId:id};clearSubs();clearGameTimers();renderedIds="";
   try{await ensureDay(WEEK,id);}catch(e){handleErr(e);}
   const day=PROGRAM.find(d=>d.id===id);
   const u=onSnapshot(dref(WEEK,id),snap=>{liveOn(true);
@@ -283,7 +318,7 @@ function renderSession(day){
   let h='<div class="screen"><button class="back" id="back">&lsaquo; Week '+WEEK+'</button><div class="shead"><h2>'+esc(day.name)+'</h2><div class="date">Week '+WEEK+' &middot; Day '+day.id+'</div></div>';
   d.exercises.forEach((e,i)=>{
     const v=vol(e),t=tgt(e),hi=hit(e);
-    h+='<div class="ex" data-i="'+i+'"><button class="row toggle">'+
+    h+='<div class="ex" data-i="'+i+'" style="animation-delay:'+(i*0.04)+'s"><button class="row toggle">'+
       '<div class="nm"><div class="t" id="t-'+i+'">'+esc(e.name)+'</div><div class="tg" id="tg-'+i+'">target '+e.ts+' \u00D7 '+e.tr+' &middot; '+esc(e.load||'')+'</div></div>'+
       '<span class="badge '+(hi?'hit':'')+'" id="bd-'+i+'">'+(hi?'100%':v+'/'+t)+'</span><span class="chev2">&rsaquo;</span></button>'+
       '<div class="panel">'+
@@ -403,34 +438,152 @@ function introSplash(){
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(reduce)return;
   const ov=document.createElement('div'); ov.id='intro';
-  const p=document.createElement('div'); p.className='peach'; p.textContent='\uD83C\uDF51';
+  const p=document.createElement('div'); p.className='peach'; p.textContent=randEmoji();
   ov.appendChild(p); document.body.appendChild(ov);
-  // grow + wobble, then burst
   p.animate([
-    {transform:'scale(0) rotate(-20deg)',opacity:0,offset:0},
-    {transform:'scale(1.15) rotate(8deg)',opacity:1,offset:.45},
-    {transform:'scale(.92) rotate(-4deg)',opacity:1,offset:.62},
-    {transform:'scale(1.6) rotate(0deg)',opacity:1,offset:.82},
-    {transform:'scale(2.4) rotate(0deg)',opacity:0,offset:1}
-  ],{duration:1150,easing:'cubic-bezier(.3,.8,.3,1)',fill:'forwards'});
-  // burst shards of peach near the end
-  setTimeout(()=>{
-    const cx=innerWidth/2, cy=innerHeight/2;
-    for(let i=0;i<22;i++){
-      const s=document.createElement('div'); s.className='fxbit';
-      s.style.position='fixed'; s.style.left=cx+'px'; s.style.top=cy+'px';
-      s.style.fontSize=(16+Math.random()*24)+'px'; s.textContent='\uD83C\uDF51';
-      document.body.appendChild(s);
-      const ang=Math.random()*Math.PI*2, dist=140+Math.random()*260;
-      const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist;
-      s.animate([{transform:'translate(0,0) scale(.5)',opacity:1},
-        {transform:'translate('+dx+'px,'+(dy+120)+'px) scale(1) rotate('+(Math.random()*360-180)+'deg)',opacity:0}],
-        {duration:900+Math.random()*500,easing:'cubic-bezier(.2,.7,.3,1)',fill:'forwards'});
-      setTimeout(()=>s.remove(),1500);
-    }
-  },820);
-  setTimeout(()=>{ ov.style.transition='opacity .3s'; ov.style.opacity='0'; setTimeout(()=>ov.remove(),320); },1150);
+    {transform:'scale(0) rotate(-25deg)',opacity:0,offset:0},
+    {transform:'scale(1.12) rotate(12deg)',opacity:1,offset:.14},
+    {transform:'scale(1) rotate(-10deg)',opacity:1,offset:.24},
+    {transform:'scale(1.07) rotate(9deg)',opacity:1,offset:.34},
+    {transform:'scale(1) rotate(-8deg)',opacity:1,offset:.44},
+    {transform:'scale(1.06) rotate(7deg)',opacity:1,offset:.54},
+    {transform:'scale(1) rotate(-6deg)',opacity:1,offset:.64},
+    {transform:'scale(1.05) rotate(5deg)',opacity:1,offset:.72},
+    {transform:'scale(1.1) rotate(-3deg)',opacity:1,offset:.8},
+    {transform:'scale(1.35) rotate(0deg)',opacity:1,offset:.88},
+    {transform:'scale(1.7) rotate(0deg)',opacity:0,offset:1}
+  ],{duration:3200,easing:'cubic-bezier(.3,.7,.3,1)',fill:'forwards'});
+  setTimeout(()=>wetBurst(ov,innerWidth/2,innerHeight/2),2880);
+  setTimeout(()=>{ ov.style.transition='opacity .4s'; ov.style.opacity='0'; setTimeout(()=>ov.remove(),420); },3300);
 }
+function wetBurst(parent,cx,cy){
+  parent=parent||document.body;
+  const ring=document.createElement('div'); ring.className='fxbit';
+  ring.style.cssText='left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:radial-gradient(circle,rgba(150,210,255,.55),rgba(120,180,230,0) 70%)';
+  parent.appendChild(ring);
+  ring.animate([{transform:'scale(.3)',opacity:.9},{transform:'scale(10)',opacity:0}],{duration:720,easing:'ease-out',fill:'forwards'});
+  setTimeout(()=>ring.remove(),780);
+  for(let i=0;i<30;i++){
+    const wet=Math.random()<0.3;
+    const d=document.createElement('div'); d.className='fxbit';
+    const sz=8+Math.random()*18;
+    if(wet){ d.textContent='\uD83D\uDCA6'; d.style.fontSize=(13+Math.random()*16)+'px'; }
+    else{ d.style.cssText='width:'+sz+'px;height:'+sz+'px;border-radius:52% 52% 58% 58%;background:radial-gradient(circle at 35% 28%,rgba(195,232,255,.95),rgba(110,170,225,.35));box-shadow:0 0 8px rgba(150,205,255,.35)'; }
+    d.style.left=cx+'px'; d.style.top=cy+'px';
+    parent.appendChild(d);
+    const ang=Math.random()*Math.PI*2, dist=120+Math.random()*300;
+    const dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist;
+    d.animate([
+      {transform:'translate(0,0) scale(.4) scaleY(.8)',opacity:1,offset:0},
+      {transform:'translate('+(dx*0.6)+'px,'+(dy*0.6)+'px) scale(1) scaleY(1)',opacity:1,offset:.4},
+      {transform:'translate('+dx+'px,'+(dy+280)+'px) scale(.9) scaleY(2.4)',opacity:0,offset:1}
+    ],{duration:1100+Math.random()*650,easing:'cubic-bezier(.2,.6,.4,1)',fill:'forwards'});
+    setTimeout(()=>d.remove(),1850);
+  }
+}
+
+/* ---------- mini games ---------- */
+let gameTimers=[];
+function clearGameTimers(){gameTimers.forEach(t=>{clearTimeout(t);clearInterval(t)});gameTimers=[];}
+const sanit=e=>(e||'').replace(/[^a-z0-9]/gi,'_');
+async function saveBest(game,score,lower){
+  try{
+    const ref=doc(db,'games',game); const snap=await getDoc(ref);
+    const data=snap.exists()?snap.data():{bests:{}};
+    if(!data.bests)data.bests={};
+    const me=auth.currentUser?auth.currentUser.email:'me'; const k=sanit(me);
+    const cur=data.bests[k]?data.bests[k].score:(lower?Infinity:-Infinity);
+    if((lower&&score<cur)||(!lower&&score>cur)){ data.bests[k]={name:me,score}; await setDoc(ref,data,{merge:true}); }
+    return data.bests;
+  }catch(e){return null;}
+}
+async function getBests(game){try{const snap=await getDoc(doc(db,'games',game));return snap.exists()?(snap.data().bests||{}):{};}catch(e){return {};}}
+function bestsHTML(bests,lower,unit){
+  const arr=Object.values(bests||{}).sort((a,b)=>lower?a.score-b.score:b.score-a.score);
+  if(!arr.length)return '<div class="lb-empty">No scores yet \u2014 be the first.</div>';
+  return arr.map((r,i)=>'<div class="lb-row"><span>'+(i===0?'\uD83C\uDFC6':(i+1)+'.')+' '+esc((r.name||'').split('@')[0])+'</span><b>'+r.score+(unit||'')+'</b></div>').join('');
+}
+
+function gamesCardHTML(){
+  return '<button class="gcard" id="gamesBtn"><div class="gico">\uD83C\uDFAE</div><div class="gtxt"><div class="gt">Games</div><div class="gs">Take a break \u00b7 beat each other\u2019s scores</div></div><div class="chev">\u203a</div></button>';
+}
+function renderGames(){
+  view={screen:"games",dayId:null}; clearSubs(); clearGameTimers(); liveOn(true);
+  app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Home</button>'+
+    '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
+    '<button class="gcard play" id="g-pop"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Peach Pop</div><div class="gs">Tap the critters — 25 seconds</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it turns peach</div></div><div class="chev">\u203a</div></button>'+
+    '</div>';
+  document.getElementById('gback').onclick=renderHome;
+  document.getElementById('g-pop').onclick=playPeachPop;
+  document.getElementById('g-rxn').onclick=playReaction;
+}
+
+function playPeachPop(){
+  view={screen:"game",dayId:null}; clearGameTimers();
+  let score=0, time=25;
+  app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Games</button>'+
+    '<div class="gbar"><div>Score <b id="pp-s">0</b></div><div>Time <b id="pp-t">25</b>s</div></div>'+
+    '<div class="gamearea" id="pp-area"></div>'+
+    '<div id="pp-end"></div></div>';
+  document.getElementById('gback').onclick=renderGames;
+  const area=document.getElementById('pp-area');
+  function spawn(){
+    if(view.screen!=="game")return;
+    const golden=Math.random()<0.14;
+    const b=document.createElement('button'); b.className='pp-peach'+(golden?' gold':'');
+    b.textContent=golden?'\u2728':randEmoji();
+    const sz=42+Math.random()*26; b.style.fontSize=sz+'px';
+    const w=area.clientWidth-sz, h=area.clientHeight-sz;
+    b.style.left=Math.random()*Math.max(10,w)+'px'; b.style.top=Math.random()*Math.max(10,h)+'px';
+    b.animate([{transform:'scale(0)'},{transform:'scale(1)'}],{duration:140,easing:'ease-out'});
+    let alive=true;
+    b.onclick=()=>{ if(!alive)return; alive=false; score+=golden?3:1; document.getElementById('pp-s').textContent=score;
+      const r=b.getBoundingClientRect(); wetBurst(document.body,r.left+r.width/2,r.top+r.height/2);
+      b.animate([{transform:'scale(1)',opacity:1},{transform:'scale(1.7)',opacity:0}],{duration:200,fill:'forwards'});
+      setTimeout(()=>b.remove(),180); };
+    area.appendChild(b);
+    const rm=setTimeout(()=>{ if(alive){alive=false; b.animate([{opacity:1},{opacity:0}],{duration:200,fill:'forwards'}); setTimeout(()=>b.remove(),190);} },820+Math.random()*500);
+    gameTimers.push(rm);
+  }
+  const si=setInterval(()=>{ spawn(); if(Math.random()<0.4)spawn(); },560); gameTimers.push(si);
+  const ti=setInterval(async()=>{ time--; const tEl=document.getElementById('pp-t'); if(tEl)tEl.textContent=time;
+    if(time<=0){ clearGameTimers(); area.querySelectorAll('.pp-peach').forEach(x=>x.remove());
+      const bests=await saveBest('peachpop',score,false)||await getBests('peachpop');
+      const end=document.getElementById('pp-end');
+      end.innerHTML='<div class="result"><div class="rscore">'+score+'</div><div class="rcap">peaches popped</div>'+
+        '<div class="lb"><div class="lb-h">Best scores</div>'+bestsHTML(bests,false,'')+'</div>'+
+        '<div class="racts"><button class="save" id="pp-again">Play again</button><button class="cancel" id="pp-back">Back</button></div></div>';
+      document.getElementById('pp-again').onclick=playPeachPop;
+      document.getElementById('pp-back').onclick=renderGames;
+    }
+  },1000); gameTimers.push(ti);
+}
+
+function playReaction(){
+  view={screen:"game",dayId:null}; clearGameTimers();
+  let startT=0, ready=false, waiting=true;
+  app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Games</button>'+
+    '<div class="shead"><h2>Reaction \u26A1</h2></div>'+
+    '<button class="rxn wait" id="rxn"><span id="rxn-l">Tap to start</span></button>'+
+    '<div id="rxn-lb"></div></div>';
+  document.getElementById('gback').onclick=renderGames;
+  const pad=document.getElementById('rxn'), lbl=document.getElementById('rxn-l');
+  let phase='idle';
+  function arm(){ phase='waiting'; waiting=true; ready=false; pad.className='rxn wait'; lbl.textContent='Wait for peach\u2026';
+    const t=setTimeout(()=>{ phase='go'; ready=true; startT=performance.now(); pad.className='rxn go'; lbl.textContent=randEmoji()+' TAP!'; },1400+Math.random()*2600);
+    gameTimers.push(t);
+  }
+  pad.onclick=async()=>{
+    if(phase==='idle'){ arm(); return; }
+    if(phase==='waiting'){ clearGameTimers(); phase='idle'; pad.className='rxn early'; lbl.textContent='Too soon! Tap to retry'; return; }
+    if(phase==='go'){ const ms=Math.round(performance.now()-startT); phase='idle'; pad.className='rxn done'; lbl.textContent=ms+' ms \u00b7 tap to retry';
+      const bests=await saveBest('reaction',ms,true)||await getBests('reaction');
+      document.getElementById('rxn-lb').innerHTML='<div class="lb"><div class="lb-h">Best (fastest)</div>'+bestsHTML(bests,true,' ms')+'</div>';
+    }
+  };
+}
+
 /* ---------- celebration ---------- */
 function celebrate(){
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -486,7 +639,7 @@ function fxFart(){
 }
 
 function esc(s){return (s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function setWeek(w){WEEK=Math.max(1,w);document.getElementById('wkNum').textContent=WEEK;if(view.screen==="home")renderHome();else openDay(view.dayId);}
+function setWeek(w){if(view.screen!=="home"&&view.screen!=="session")return;WEEK=Math.max(1,w);document.getElementById('wkNum').textContent=WEEK;if(view.screen==="home")renderHome();else openDay(view.dayId);}
 document.getElementById('wkUp').onclick=()=>setWeek(WEEK+1);
 document.getElementById('wkDown').onclick=()=>setWeek(WEEK-1);
 
@@ -497,7 +650,7 @@ function handleErr(e){
 }
 function signInScreen(){
   document.getElementById('live').style.display='none';
-  app.innerHTML='<div class="center"><h2>Training Logbook</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
+  app.innerHTML='<div class="center"><h2>Pelooty 🍑</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
   document.getElementById('gin').onclick=()=>signInWithPopup(auth,provider).catch(e=>alert(e.message));
 }
 onAuthStateChanged(auth,user=>{if(user){document.getElementById('live').style.display='';introSplash();renderHome();}else signInScreen();});
