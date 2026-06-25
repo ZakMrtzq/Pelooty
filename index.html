@@ -204,7 +204,11 @@
   .msg .mb{box-shadow:0 2px 8px rgba(0,0,0,.18)}
   .chatbar button{width:46px;height:46px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:18px;padding:0;border-radius:50%}
   .chatbar button:active{transform:scale(.92)}
-  .clockbar{text-align:center;font-size:12px;color:var(--muted);letter-spacing:.05em;padding:0 0 8px}
+  .clockbar{text-align:center;font-size:12px;color:var(--muted);letter-spacing:.05em;padding:0 0 4px}
+  .presbar{text-align:center;font-size:11px;color:var(--muted);padding:0 0 8px;display:none}
+  .pdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle}
+  .pdot.on{background:var(--done);box-shadow:0 0 0 0 rgba(123,201,154,.6);animation:pulse 2s infinite}
+  .pdot.off{background:#5b5b5b}
   #intro{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(120% 120% at 50% 45%,#241712 0%,var(--bg) 70%);pointer-events:none}
   #intro .peach{font-size:120px;will-change:transform,opacity;filter:drop-shadow(0 8px 30px rgba(255,133,103,.4))}
@@ -225,6 +229,7 @@
     </div>
   </div>
   <div class="clockbar"><span id="clockNow"></span></div>
+  <div class="presbar" id="presbar"></div>
   <div id="app"></div>
   <div class="foot" id="foot">Realtime &middot; changes sync live across devices</div>
   <div id="fx"></div>
@@ -232,6 +237,10 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+
+function showFatal(msg){ try{ const a=document.getElementById('app'); if(a)a.innerHTML='<div style="padding:24px;color:#FF8567;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.5">App error \u2014 send this to fix it:\n\n'+String(msg)+'</div>'; }catch(_){ } }
+window.addEventListener('error',e=>showFatal((e&&e.message)||(e&&e.error)||'error'));
+window.addEventListener('unhandledrejection',e=>showFatal((e&&e.reason&&e.reason.message)||(e&&e.reason)||'promise rejection'));
 
 const firebaseConfig = {
   apiKey: "AIzaSyBVOGJeJ-lsswJi7B44agP6U4k8ilBR3bw",
@@ -806,6 +815,27 @@ async function finishKegel(d){
 function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
 let clockStarted=false;
 function startClock(){ if(clockStarted)return; clockStarted=true; const tick=()=>{const el=document.getElementById('clockNow'); if(el)el.textContent=fmtNow();}; tick(); setInterval(tick,1000); }
+let presenceStarted=false, presenceData={};
+function presenceLabel(){
+  if(view.screen==='session'){const d=PROGRAM.find(x=>x.id===view.dayId);return 'Week '+WEEK+' \u00b7 '+(d?d.name:'Day '+view.dayId);}
+  return ({home:'Home',games:'Games',game:'Playing a game',kegel:'Kegel Trainer',chat:'Chat',calendar:'Calendar'}[view.screen])||'In the app';
+}
+function startPresence(){
+  if(presenceStarted)return; presenceStarted=true;
+  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me); const ref=doc(db,'presence','state');
+  const beat=()=>{ const u={}; u[myKey]={name:me,label:presenceLabel(),t:Date.now()}; setDoc(ref,{users:u},{merge:true}).catch(()=>{}); };
+  beat(); setInterval(beat,3000);
+  onSnapshot(ref,snap=>{ presenceData=(snap.exists()&&snap.data().users)||{}; drawPresence(myKey); },()=>{});
+  setInterval(()=>drawPresence(myKey),5000);
+}
+function drawPresence(myKey){
+  const el=document.getElementById('presbar'); if(!el)return;
+  let other=null; for(const k in presenceData){ if(k!==myKey)other=presenceData[k]; }
+  if(!other){ el.style.display='none'; el.innerHTML=''; return; }
+  const online=(Date.now()-(other.t||0))<40000; const who=esc((other.name||'').split('@')[0]);
+  el.style.display='block';
+  el.innerHTML='<span class="pdot '+(online?'on':'off')+'"></span>'+who+(online?(' \u00b7 '+esc(other.label||'')):' \u00b7 offline');
+}
 function esc(s){return (s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function setWeek(w){if(view.screen!=="home"&&view.screen!=="session")return;WEEK=Math.max(1,w);document.getElementById('wkNum').textContent=WEEK;setDoc(doc(db,'meta','app'),{week:WEEK},{merge:true}).catch(()=>{});if(view.screen==="home")renderHome();else openDay(view.dayId);}
 document.getElementById('wkUp').onclick=()=>setWeek(WEEK+1);
@@ -831,7 +861,7 @@ function signInScreen(){
   app.innerHTML='<div class="center"><h2>Pelooty 🍑</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
   document.getElementById('gin').onclick=doSignIn;
 }
-onAuthStateChanged(auth,async user=>{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); renderHome(); } else signInScreen(); });
+onAuthStateChanged(auth,async user=>{ try{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
 </script>
 </body>
 </html>
