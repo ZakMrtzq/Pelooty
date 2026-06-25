@@ -209,6 +209,29 @@
   .pdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:6px;vertical-align:middle}
   .pdot.on{background:var(--done);box-shadow:0 0 0 0 rgba(123,201,154,.6);animation:pulse 2s infinite}
   .pdot.off{background:#5b5b5b}
+  .cday{flex-direction:column;gap:1px}
+  .cdn{font-size:13px;line-height:1}
+  .ctag{font-size:8px;font-weight:800;letter-spacing:.02em;line-height:1;background:rgba(0,0,0,.18);padding:1px 3px;border-radius:4px;margin-top:1px}
+  .cday.on .ctag{background:rgba(0,0,0,.22);color:#241008}
+  .picker{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center}
+  .picksheet{background:var(--card2);border-top-left-radius:20px;border-top-right-radius:20px;width:100%;max-width:520px;padding:18px 16px 26px;max-height:80vh;overflow-y:auto;animation:rise .25s ease}
+  .pickh{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 2px 12px}
+  .pickopt{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;font-size:14px;font-weight:600;margin-bottom:8px}
+  .pickopt:active{border-color:var(--accent)}
+  .pickopt.clr{color:var(--muted)}
+  .pickopt.cancel{text-align:center;color:var(--muted);background:none;border:none;margin-top:4px}
+  .kbcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px;text-align:left}
+  .kbtop{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+  .kbtop b{font-size:14px}
+  .kbtop span{font-size:11px;color:var(--muted);white-space:nowrap}
+  .khist{margin-top:8px;border-top:1px solid var(--line);padding-top:8px;display:flex;flex-direction:column;gap:4px}
+  .kh{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);gap:10px}
+  .kh span:first-child{color:var(--ink);font-weight:600}
+  .cbadge{background:var(--accent);color:#241008;font-size:11px;font-weight:800;min-width:18px;height:18px;padding:0 5px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px}
+  .ttt{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-width:300px;margin:12px auto}
+  .tcell{aspect-ratio:1;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:38px;display:flex;align-items:center;justify-content:center;transition:transform .1s}
+  .tcell:active{background:var(--card2);transform:scale(.96)}
+  .tstatus{text-align:center;font-size:15px;font-weight:700;margin-bottom:4px;min-height:22px}
   #intro{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(120% 120% at 50% 45%,#241712 0%,var(--bg) 70%);pointer-events:none}
   #intro .peach{font-size:120px;will-change:transform,opacity;filter:drop-shadow(0 8px 30px rgba(255,133,103,.4))}
@@ -344,7 +367,7 @@ function renderHome(){
   });
   h+='</div>'+homeExtras()+'</div>';app.innerHTML=h;
   document.getElementById('signout').onclick=()=>signOut(auth);
-  {const cb=document.getElementById('calBtn');if(cb)cb.onclick=renderCalendar; const ch=document.getElementById('chatBtn');if(ch)ch.onclick=renderChat; const gb=document.getElementById('gamesBtn');if(gb)gb.onclick=renderGames;} startClock();
+  {const cb=document.getElementById('calBtn');if(cb)cb.onclick=renderCalendar; const ch=document.getElementById('chatBtn');if(ch)ch.onclick=renderChat; const gb=document.getElementById('gamesBtn');if(gb)gb.onclick=renderGames;} startClock(); drawChatBadge();
   app.querySelectorAll('.day').forEach(b=>b.onclick=()=>openDay(+b.dataset.day));
   PROGRAM.forEach(day=>{
     const u=onSnapshot(dref(WEEK,day.id),snap=>{liveOn(true);
@@ -584,10 +607,12 @@ function renderGames(){
   app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Home</button>'+
     '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
     kegelCard()+
+    '<button class="gcard play" id="g-ttt"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Tic-Tac-Toe</div><div class="gs">Live \u00b7 you vs your partner</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it changes</div></div><div class="chev">\u203a</div></button>'+
     '</div>';
   document.getElementById('gback').onclick=renderHome;
   document.getElementById('g-keg').onclick=()=>renderKegel();
+  document.getElementById('g-ttt').onclick=renderTTT;
   document.getElementById('g-rxn').onclick=playReaction;
 }
 
@@ -671,7 +696,7 @@ function fxFart(){
 
 function homeExtras(){
   return '<button class="gcard" id="calBtn"><div class="gico">\uD83D\uDCC5</div><div class="gtxt"><div class="gt">Calendar</div></div><div class="chev">\u203a</div></button>'+
-  '<button class="gcard" id="chatBtn"><div class="gico">\uD83D\uDCAC</div><div class="gtxt"><div class="gt">Chat</div></div><div class="chev">\u203a</div></button>'+
+  '<button class="gcard" id="chatBtn"><div class="gico">\uD83D\uDCAC</div><div class="gtxt"><div class="gt">Chat</div></div><span class="cbadge" id="chatBadge" style="display:none"></span><div class="chev">\u203a</div></button>'+
   '<button class="gcard" id="gamesBtn"><div class="gico">\uD83C\uDFAE</div><div class="gtxt"><div class="gt">Games</div></div><div class="chev">\u203a</div></button>';
 }
 
@@ -682,12 +707,14 @@ function renderChat(){
   const me=auth.currentUser?auth.currentUser.email:'';
   app.innerHTML='<div class="screen"><button class="back" id="cback">\u2039 Home</button><div class="shead"><h2>Chat \uD83D\uDCAC</h2></div><div class="chatwrap" id="chatwrap"><div class="lb-empty" id="chatempty" style="text-align:center;margin-top:24px">Loading\u2026</div></div><div class="chatbar"><input id="chatin" placeholder="Message\u2026" autocomplete="off"/><button id="chatsend" aria-label="Send">\u27A4</button></div></div>';
   document.getElementById('cback').onclick=renderHome;
+  if('Notification'in window&&Notification.permission==='default'){try{Notification.requestPermission();}catch(e){}}
+  markChatRead();
   const send=()=>{const inp=document.getElementById('chatin');const t=inp.value.trim();if(!t)return;inp.value='';
     addDoc(collection(db,'messages'),{e:me,txt:t,t:Date.now()}).catch(e=>console.warn(e));};
   document.getElementById('chatsend').onclick=send;
   document.getElementById('chatin').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
   const qy=query(collection(db,'messages'),orderBy('t'),limit(400));
-  const u=onSnapshot(qy,snap=>{ liveOn(true); const msgs=[]; snap.forEach(dd=>msgs.push(dd.data())); appendChat(msgs,me); },err=>{liveOn(false);handleErr(err);});
+  const u=onSnapshot(qy,snap=>{ liveOn(true); const msgs=[]; snap.forEach(dd=>msgs.push(dd.data())); appendChat(msgs,me); markChatRead(); },err=>{liveOn(false);handleErr(err);});
   subs.push(u);
 }
 function appendChat(msgs,me){
@@ -720,29 +747,47 @@ function renderCalendar(){
   subs.push(u);
 }
 function calcStreak(){let s=0;let d=new Date();for(;;){const k=ymd(d);if(calMarks[k]&&calMarks[k].done){s++;d.setDate(d.getDate()-1);}else{if(k===ymd(new Date())){d.setDate(d.getDate()-1);continue;}break;}if(s>500)break;}return s;}
+function openDayPicker(k){
+  const ov=document.createElement('div'); ov.className='picker';
+  let h='<div class="picksheet"><div class="pickh">What did you train?</div>';
+  PROGRAM.forEach(d=>{h+='<button class="pickopt" data-id="'+d.id+'" data-n="'+esc(d.name)+'">D'+d.id+' \u00b7 '+esc(d.name)+'</button>';});
+  h+='<button class="pickopt clr" data-id="0">Clear / not trained</button><button class="pickopt cancel">Cancel</button></div>';
+  ov.innerHTML=h; document.body.appendChild(ov);
+  const close=()=>ov.remove(); ov.addEventListener('click',e=>{if(e.target===ov)close();});
+  ov.querySelectorAll('.pickopt').forEach(b=>b.onclick=()=>{ if(b.classList.contains('cancel')){close();return;} const id=+b.dataset.id;
+    if(id===0){delete calMarks[k];} else {calMarks[k]={done:true,dayId:id,day:b.dataset.n};}
+    setDoc(doc(db,'calendar','marks'),{days:calMarks},{merge:true}).catch(e=>console.warn(e)); close(); drawCal(); });
+}
 function drawCal(){
   const host=document.getElementById('calhost');if(!host)return;
   const y=calMonth.getFullYear(),m=calMonth.getMonth();
   const start=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
-  const mn=calMonth.toLocaleString('default',{month:'long',year:'numeric'});
+  const mn=calMonth.toLocaleString('de-DE',{month:'long',year:'numeric'});
   let h='<div class="calhead"><button id="cprev">\u2039</button><div class="cm">'+mn+'</div><button id="cnext">\u203a</button></div>';
   h+='<div class="calstreak">\uD83D\uDD25 '+calcStreak()+' day streak</div><div class="calgrid">';
-  ['M','T','W','T','F','S','S'].forEach(x=>h+='<div class="cdow">'+x+'</div>');
+  ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(x=>h+='<div class="cdow">'+x+'</div>');
   for(let i=0;i<start;i++)h+='<div></div>';
   const today=ymd(new Date());
-  for(let dd=1;dd<=days;dd++){const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');const on=calMarks[k]&&calMarks[k].done;
-    h+='<button class="cday'+(on?' on':'')+(k===today?' today':'')+'" data-d="'+k+'">'+dd+'</button>';}
-  h+='</div><div class="calhint">Tap a day to mark it trained.</div>';
+  for(let dd=1;dd<=days;dd++){const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');const mk=calMarks[k];const on=mk&&mk.done;
+    h+='<button class="cday'+(on?' on':'')+(k===today?' today':'')+'" data-d="'+k+'"><span class="cdn">'+dd+'</span>'+((on&&mk.dayId)?'<i class="ctag">D'+mk.dayId+'</i>':'')+'</button>';}
+  h+='</div><div class="calhint">Tap a day to log which workout you did.</div>';
   host.innerHTML=h;
   document.getElementById('cprev').onclick=()=>{calMonth=new Date(y,m-1,1);drawCal();};
   document.getElementById('cnext').onclick=()=>{calMonth=new Date(y,m+1,1);drawCal();};
-  host.querySelectorAll('.cday').forEach(b=>b.onclick=()=>{const k=b.dataset.d;const cur=calMarks[k]&&calMarks[k].done;calMarks[k]={done:!cur};setDoc(doc(db,'calendar','marks'),{days:calMarks},{merge:true}).catch(e=>console.warn(e));drawCal();});
+  host.querySelectorAll('.cday').forEach(b=>b.onclick=()=>openDayPicker(b.dataset.d));
 }
 
 /* ---- kegel trainer ---- */
 const KORDER=['Fun','Easy','Medium','Difficult','Extra'];
 const KDIFF={Fun:{total:60,hold:5,reps:4,pulses:8},Easy:{total:90,hold:10,reps:6,pulses:10},Medium:{total:150,hold:20,reps:8,pulses:14},Difficult:{total:240,hold:40,reps:10,pulses:18},Extra:{total:300,hold:60,reps:12,pulses:24}};
 function kegelCard(){return '<button class="gcard play" id="g-keg"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Kegel Trainer</div><div class="gs">Squeeze \u00b7 hold \u00b7 pulse \u00b7 reverse</div></div><div class="chev">\u203a</div></button>';}
+function fmtDE(t){ if(!t)return ''; try{return new Date(t).toLocaleString('de-DE',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return new Date(t).toLocaleString();} }
+function kegelBoardHTML(bests){
+  const arr=Object.values(bests||{}).sort((a,b)=>(b.score||0)-(a.score||0));
+  if(!arr.length)return '<div class="lb-empty">No sessions yet.</div>';
+  return arr.map(r=>{ const hist=(r.history||[]).slice().reverse().slice(0,4).map(h=>'<div class="kh"><span>'+esc(h.d)+'</span><span>'+fmtDE(h.t)+'</span></div>').join('');
+    return '<div class="kbcard"><div class="kbtop"><b>'+esc((r.name||'').split('@')[0])+'</b><span>'+(r.score||0)+' \u00b7 hardest '+esc(r.hardest||'\u2014')+'</span></div>'+(hist?'<div class="khist">'+hist+'</div>':'')+'</div>'; }).join('');
+}
 async function renderKegel(){
   view={screen:"kegel",dayId:null}; clearSubs(); clearGameTimers();
   app.innerHTML='<div class="screen"><button class="back" id="kback">\u2039 Games</button><div class="shead"><h2>Kegel Trainer</h2></div>'+
@@ -752,7 +797,7 @@ async function renderKegel(){
   document.getElementById('kback').onclick=renderGames;
   app.querySelectorAll('.klev').forEach(b=>b.onclick=()=>startKegel(b.dataset.d));
   const bests=await getBests('kegel'); const el=document.getElementById('kbest');
-  if(el)el.innerHTML='<div class="lb"><div class="lb-h">Sessions completed</div>'+bestsHTML(bests,false,'')+'</div>';
+  if(el)el.innerHTML='<div class="lb"><div class="lb-h">Leaderboard</div>'+kegelBoardHTML(bests)+'</div>';
 }
 function buildRoutine(d){
   const c=KDIFF[d];const ph=[];ph.push({t:'relax',l:'Get ready \u2014 breathe',s:5});
@@ -804,7 +849,8 @@ async function finishKegel(d){
   try{const ref=doc(db,'games','kegel');const snap=await getDoc(ref);const data=snap.exists()?snap.data():{bests:{}};if(!data.bests)data.bests={};
     const me=auth.currentUser?auth.currentUser.email:'me';const k=sanit(me);const prev=data.bests[k]?data.bests[k].score:0;
     const hp=data.bests[k]?KORDER.indexOf(data.bests[k].hardest||'Fun'):-1;const hd=Math.max(hp,KORDER.indexOf(d));
-    data.bests[k]={name:me,score:prev+1,hardest:KORDER[Math.max(0,hd)]};await setDoc(ref,data,{merge:true});
+    const ex=data.bests[k]||{}; const hist=(ex.history||[]).concat([{d:d,t:Date.now()}]).slice(-8);
+    data.bests[k]={name:me,score:prev+1,hardest:KORDER[Math.max(0,hd)],last:{d:d,t:Date.now()},history:hist};await setDoc(ref,data,{merge:true});
   }catch(e){console.warn(e);}
   const bests=await getBests('kegel');
   app.innerHTML='<div class="screen"><div class="result"><div class="rscore">\u2713</div><div class="rcap">'+d+' session complete</div><div class="lb"><div class="lb-h">Sessions completed</div>'+bestsHTML(bests,false,'')+'</div><div class="racts"><button class="save" id="kagain">Again</button><button class="cancel" id="kdone">Back</button></div></div></div>';
@@ -812,7 +858,7 @@ async function finishKegel(d){
   document.getElementById('kdone').onclick=renderKegel;
 }
 
-function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'short'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
+function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
 let clockStarted=false;
 function startClock(){ if(clockStarted)return; clockStarted=true; const tick=()=>{const el=document.getElementById('clockNow'); if(el)el.textContent=fmtNow();}; tick(); setInterval(tick,1000); }
 let presenceStarted=false, presenceData={};
@@ -822,19 +868,69 @@ function presenceLabel(){
 }
 function startPresence(){
   if(presenceStarted)return; presenceStarted=true;
-  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me); const ref=doc(db,'presence','state');
-  const beat=()=>{ const u={}; u[myKey]={name:me,label:presenceLabel(),t:Date.now()}; setDoc(ref,{users:u},{merge:true}).catch(()=>{}); };
+  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
+  const beat=()=>{ setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()}).catch(e=>console.warn('presence',e)); };
   beat(); setInterval(beat,3000);
-  onSnapshot(ref,snap=>{ presenceData=(snap.exists()&&snap.data().users)||{}; drawPresence(myKey); },()=>{});
+  window.addEventListener('beforeunload',()=>{try{setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()-99999});}catch(e){}});
+  onSnapshot(collection(db,'presence'),snap=>{ presenceData={}; snap.forEach(d=>presenceData[d.id]=d.data()); drawPresence(myKey); },e=>console.warn('presence sub',e));
   setInterval(()=>drawPresence(myKey),5000);
 }
 function drawPresence(myKey){
-  const el=document.getElementById('presbar'); if(!el)return;
+  const el=document.getElementById('presbar'); if(!el)return; el.style.display='block';
   let other=null; for(const k in presenceData){ if(k!==myKey)other=presenceData[k]; }
-  if(!other){ el.style.display='none'; el.innerHTML=''; return; }
-  const online=(Date.now()-(other.t||0))<40000; const who=esc((other.name||'').split('@')[0]);
-  el.style.display='block';
-  el.innerHTML='<span class="pdot '+(online?'on':'off')+'"></span>'+who+(online?(' \u00b7 '+esc(other.label||'')):' \u00b7 offline');
+  if(!other){ el.innerHTML='<span class="pdot off"></span>waiting for your partner\u2026'; return; }
+  const age=Date.now()-(other.t||0), online=age<40000, who=esc((other.name||'').split('@')[0]);
+  if(online) el.innerHTML='<span class="pdot on"></span>'+who+' \u00b7 '+esc(other.label||'here');
+  else { const mins=Math.max(1,Math.round(age/60000)); el.innerHTML='<span class="pdot off"></span>'+who+' \u00b7 last seen '+(mins<90?mins+'m ago':'a while ago'); }
+}
+let chatWatchStarted=false, allChat=[], lastReadChat=0, unreadChat=0, chatMaxSeen=0;
+function notify(title,body){ if('Notification'in window && Notification.permission==='granted'){ try{new Notification('Pelooty \u00b7 '+title,{body:body});}catch(e){} } if(navigator.vibrate)navigator.vibrate([50,40,50]); }
+function drawChatBadge(){ const b=document.getElementById('chatBadge'); if(!b)return; if(unreadChat>0){b.style.display='inline-flex';b.textContent=unreadChat>9?'9+':String(unreadChat);} else b.style.display='none'; }
+function markChatRead(){ const me=auth.currentUser?auth.currentUser.email:''; lastReadChat=Date.now(); unreadChat=0; drawChatBadge(); setDoc(doc(db,'reads',sanit(me)),{chatT:lastReadChat},{merge:true}).catch(()=>{}); }
+async function startChatWatch(){
+  if(chatWatchStarted)return; chatWatchStarted=true;
+  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
+  try{const r=await getDoc(doc(db,'reads',myKey)); if(r.exists()&&r.data().chatT)lastReadChat=r.data().chatT;}catch(e){}
+  const qy=query(collection(db,'messages'),orderBy('t'),limit(400));
+  onSnapshot(qy,snap=>{ const arr=[]; snap.forEach(d=>arr.push(d.data())); allChat=arr;
+    const incoming=arr.filter(m=>m.e!==me);
+    unreadChat=incoming.filter(m=>(m.t||0)>lastReadChat).length;
+    const newestT=incoming.length?incoming[incoming.length-1].t:0;
+    if(newestT>chatMaxSeen){ if(chatMaxSeen>0 && view.screen!=='chat'){ const last=incoming[incoming.length-1]; notify((last.e||'').split('@')[0], last.txt); } chatMaxSeen=newestT; }
+    if(view.screen==='chat')markChatRead(); else drawChatBadge();
+  },e=>console.warn('chatwatch',e));
+}
+
+/* ---- realtime tic-tac-toe ---- */
+const TWIN=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+function tttWinner(b){ for(const l of TWIN){ if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]])return b[l[0]]; } return b.every(x=>x)?'draw':''; }
+function renderTTT(){
+  view={screen:"game",dayId:null}; clearSubs(); clearGameTimers();
+  const me=auth.currentUser?auth.currentUser.email:''; const ref=doc(db,'games','ttt'); let claimed=false;
+  app.innerHTML='<div class="screen"><button class="back" id="tback">\u2039 Games</button><div class="shead"><h2>Tic-Tac-Toe</h2></div><div class="tstatus" id="tstatus">Connecting\u2026</div><div class="ttt" id="ttt"></div><div class="racts"><button class="cancel" id="tnew">New game</button></div></div>';
+  document.getElementById('tback').onclick=renderGames;
+  document.getElementById('tnew').onclick=()=>{ setDoc(ref,{board:Array(9).fill(''),turn:'X',winner:''},{merge:true}).catch(()=>{}); };
+  const u=onSnapshot(ref,async snap=>{
+    let d=snap.exists()?snap.data():null;
+    if(!d){ d={board:Array(9).fill(''),turn:'X',winner:'',players:{}}; try{await setDoc(ref,d);}catch(e){} }
+    const players=d.players||{};
+    let myMark = players.X===me?'X':players.O===me?'O':null;
+    if(!myMark && !claimed){ claimed=true; const mark=!players.X?'X':(!players.O&&players.X!==me?'O':null);
+      if(mark){ const pu={}; pu[mark]=me; try{await setDoc(ref,{players:pu},{merge:true});}catch(e){} return; } }
+    drawTTT(d,myMark,me,ref);
+  },e=>console.warn('ttt',e));
+  subs.push(u);
+}
+function drawTTT(d,myMark,me,ref){
+  const board=d.board||Array(9).fill(''),turn=d.turn||'X',winner=d.winner||'';
+  const sym=m=>m==='X'?'\uD83C\uDF51':m==='O'?'\uD83D\uDC18':'';
+  const st=document.getElementById('tstatus'),g=document.getElementById('ttt'); if(!g)return;
+  let msg; if(!myMark)msg='Spectating \u2014 board is full'; else if(winner==='draw')msg='Draw!'; else if(winner)msg=(winner===myMark?'You win! ':'Partner wins ')+sym(winner); else msg=(turn===myMark?('Your move '+sym(myMark)):('Waiting for partner '+sym(turn)));
+  if(st)st.textContent=msg;
+  g.innerHTML=board.map((c,i)=>'<button class="tcell" data-i="'+i+'">'+sym(c)+'</button>').join('');
+  g.querySelectorAll('.tcell').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; if(winner||!myMark||turn!==myMark||board[i])return;
+    const nb=board.slice(); nb[i]=myMark; const w=tttWinner(nb);
+    setDoc(ref,{board:nb,turn:(myMark==='X'?'O':'X'),winner:w},{merge:true}).catch(()=>{}); });
 }
 function esc(s){return (s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function setWeek(w){if(view.screen!=="home"&&view.screen!=="session")return;WEEK=Math.max(1,w);document.getElementById('wkNum').textContent=WEEK;setDoc(doc(db,'meta','app'),{week:WEEK},{merge:true}).catch(()=>{});if(view.screen==="home")renderHome();else openDay(view.dayId);}
@@ -861,7 +957,7 @@ function signInScreen(){
   app.innerHTML='<div class="center"><h2>Pelooty 🍑</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
   document.getElementById('gin').onclick=doSignIn;
 }
-onAuthStateChanged(auth,async user=>{ try{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
+onAuthStateChanged(auth,async user=>{ try{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); startChatWatch(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
 </script>
 </body>
 </html>
