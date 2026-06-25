@@ -232,6 +232,11 @@
   .tcell{aspect-ratio:1;background:var(--card);border:1px solid var(--line);border-radius:14px;font-size:38px;display:flex;align-items:center;justify-content:center;transition:transform .1s}
   .tcell:active{background:var(--card2);transform:scale(.96)}
   .tstatus{text-align:center;font-size:15px;font-weight:700;margin-bottom:4px;min-height:22px}
+  .histwrap{margin-top:20px}
+  .histuser{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .hu{font-size:13px;font-weight:700;margin-bottom:8px}
+  .hrow{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:3px 0;gap:10px}
+  .hrow span:first-child{color:var(--ink);font-weight:600}
   #intro{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
     background:radial-gradient(120% 120% at 50% 45%,#241712 0%,var(--bg) 70%);pointer-events:none}
   #intro .peach{font-size:120px;will-change:transform,opacity;filter:drop-shadow(0 8px 30px rgba(255,133,103,.4))}
@@ -607,7 +612,7 @@ function renderGames(){
   app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Home</button>'+
     '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
     kegelCard()+
-    '<button class="gcard play" id="g-ttt"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Tic-Tac-Toe</div><div class="gs">Live \u00b7 you vs your partner</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play" id="g-ttt"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Tic-Tac-Toe</div><div class="gs">Live</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it changes</div></div><div class="chev">\u203a</div></button>'+
     '</div>';
   document.getElementById('gback').onclick=renderHome;
@@ -741,12 +746,25 @@ function ymd(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'
 function renderCalendar(){
   view={screen:"calendar",dayId:null}; clearSubs(); clearGameTimers();
   if(!calMonth){const n=new Date();calMonth=new Date(n.getFullYear(),n.getMonth(),1);}
-  app.innerHTML='<div class="screen"><button class="back" id="cback">\u2039 Home</button><div class="shead"><h2>Calendar \uD83D\uDCC5</h2></div><div id="calhost"></div></div>';
+  app.innerHTML='<div class="screen"><button class="back" id="cback">\u2039 Home</button><div class="shead"><h2>Calendar \uD83D\uDCC5</h2></div><div id="calhost"></div><div id="keghist"></div></div>';
   document.getElementById('cback').onclick=renderHome;
   const u=onSnapshot(doc(db,'calendar','marks'),snap=>{liveOn(true);calMarks=(snap.exists()&&snap.data().days)||{};drawCal();},err=>{liveOn(false);handleErr(err);});
   subs.push(u);
+  loadKegelHistory();
 }
 function calcStreak(){let s=0;let d=new Date();for(;;){const k=ymd(d);if(calMarks[k]&&calMarks[k].done){s++;d.setDate(d.getDate()-1);}else{if(k===ymd(new Date())){d.setDate(d.getDate()-1);continue;}break;}if(s>500)break;}return s;}
+async function loadKegelHistory(){
+  const el=document.getElementById('keghist'); if(!el)return;
+  let bests={}; try{const snap=await getDoc(doc(db,'games','kegel')); bests=(snap.exists()&&snap.data().bests)||{};}catch(e){}
+  const arr=Object.values(bests);
+  let h='<div class="histwrap"><div class="lb-h">Kegel session history</div>';
+  if(!arr.length){ h+='<div class="lb-empty">No sessions yet.</div></div>'; el.innerHTML=h; return; }
+  arr.forEach(u=>{ const hist=(u.history||[]).slice().reverse();
+    h+='<div class="histuser"><div class="hu">'+esc((u.name||'').split('@')[0])+' \u00b7 '+(u.score||hist.length)+' total</div>';
+    h+= hist.length? hist.map(x=>'<div class="hrow"><span>'+esc(x.d)+'</span><span>'+fmtDE(x.t)+'</span></div>').join('') : '<div class="lb-empty">No sessions yet.</div>';
+    h+='</div>'; });
+  h+='</div>'; el.innerHTML=h;
+}
 function openDayPicker(k){
   const ov=document.createElement('div'); ov.className='picker';
   let h='<div class="picksheet"><div class="pickh">What did you train?</div>';
@@ -849,7 +867,7 @@ async function finishKegel(d){
   try{const ref=doc(db,'games','kegel');const snap=await getDoc(ref);const data=snap.exists()?snap.data():{bests:{}};if(!data.bests)data.bests={};
     const me=auth.currentUser?auth.currentUser.email:'me';const k=sanit(me);const prev=data.bests[k]?data.bests[k].score:0;
     const hp=data.bests[k]?KORDER.indexOf(data.bests[k].hardest||'Fun'):-1;const hd=Math.max(hp,KORDER.indexOf(d));
-    const ex=data.bests[k]||{}; const hist=(ex.history||[]).concat([{d:d,t:Date.now()}]).slice(-8);
+    const ex=data.bests[k]||{}; const hist=(ex.history||[]).concat([{d:d,t:Date.now()}]).slice(-40);
     data.bests[k]={name:me,score:prev+1,hardest:KORDER[Math.max(0,hd)],last:{d:d,t:Date.now()},history:hist};await setDoc(ref,data,{merge:true});
   }catch(e){console.warn(e);}
   const bests=await getBests('kegel');
