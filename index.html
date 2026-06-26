@@ -432,18 +432,19 @@ function renderSession(day){
     drawSets(day,i);
     const card=app.querySelector('.ex[data-i="'+i+'"]');
     card.querySelector('.toggle').onclick=ev=>{if(ev.target.closest('input'))return;card.classList.toggle('open');};
-    bindInput('en-'+i,val=>{e.name=val;const t=document.getElementById('t-'+i);if(t)t.textContent=val;},day);
-    bindInput('ld-'+i,val=>{e.load=val;patchEx(day,i);},day);
-    bindNum('es-'+i,val=>{e.ts=Math.max(1,val);patchEx(day,i);},day);
-    bindNum('er-'+i,val=>{e.tr=Math.max(1,val);patchEx(day,i);},day);
-    {const su=document.getElementById('eu-'+i);if(su)su.onchange=()=>{e.unit=su.value;const rl=document.getElementById('rl-'+i);if(rl)rl.textContent=isSec(e)?'Secs':'Reps';drawSets(day,i);patchEx(day,i);save(WEEK,day.id);};}
-    bindInput('cn-'+i,val=>{e.cnote=val;},day);
-    bindInput('an-'+i,val=>{e.anote=val;},day);
+    bindInput('en-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.name=val;const t=document.getElementById('t-'+i);if(t)t.textContent=val;},day);
+    bindInput('ld-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.load=val;patchEx(day,i);},day);
+    bindNum('es-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.ts=Math.max(1,val);patchEx(day,i);},day);
+    bindNum('er-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.tr=Math.max(1,val);patchEx(day,i);},day);
+    {const su=document.getElementById('eu-'+i);if(su)su.onchange=()=>{const ex=curEx(day,i);if(!ex)return;ex.unit=su.value;const rl=document.getElementById('rl-'+i);if(rl)rl.textContent=isSec(ex)?'Secs':'Reps';drawSets(day,i);patchEx(day,i);save(WEEK,day.id);};}
+    bindInput('cn-'+i,val=>{const ex=curEx(day,i);if(ex)ex.cnote=val;},day);
+    bindInput('an-'+i,val=>{const ex=curEx(day,i);if(ex)ex.anote=val;},day);
     card.querySelector('[data-del]').onclick=()=>{if(confirm('Remove "'+e.name+'" from this day?')){d.exercises.splice(i,1);renderedIds="";save(WEEK,day.id);renderSession(day);renderedIds=d.exercises.map(x=>x.id).join(',');}};
   });
   document.getElementById('addex').onclick=()=>showAddForm(day);
 }
 
+function curEx(day,i){const d=state[key(WEEK,day.id)];return d&&d.exercises&&d.exercises[i];}
 function bindInput(id,fn,day){const el=document.getElementById(id);if(!el)return;el.oninput=()=>{fn(el.value);save(WEEK,day.id);};}
 function bindNum(id,fn,day){const el=document.getElementById(id);if(!el)return;el.oninput=()=>{fn(parseInt(el.value)||1);save(WEEK,day.id);};}
 
@@ -491,10 +492,10 @@ function drawSets(day,i){
        (isSec(e)?'<span class="su">s</span>':'')+'</div>';});
   h+='<button class="addset" data-a="add">+ set</button>';wrap.innerHTML=h;
   wrap.querySelectorAll('.vIn').forEach(inp=>{
-    inp.oninput=()=>{const si=+inp.dataset.s,arr=e.sets,was=hit(e);
+    inp.oninput=()=>{const ex=curEx(day,i)||e,si=+inp.dataset.s,arr=ex.sets,was=hit(ex);
       let val=parseInt(inp.value);if(isNaN(val))val=0;val=Math.max(0,val);arr[si]=val;
-      inp.classList.toggle('ok',val>=e.tr);patchEx(day,i);save(WEEK,day.id);
-      if(!was&&hit(e))celebrate();};
+      inp.classList.toggle('ok',val>=ex.tr);patchEx(day,i);save(WEEK,day.id);
+      if(!was&&hit(ex))celebrate();};
   });
   wrap.querySelectorAll('button').forEach(b=>b.onclick=()=>{
     const a=b.dataset.a,si=+b.dataset.s,arr=e.sets,was=hit(e);
@@ -889,17 +890,19 @@ function startPresence(){
   const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
   const beat=()=>{ setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()}).catch(e=>console.warn('presence',e)); };
   beat(); setInterval(beat,3000);
-  window.addEventListener('beforeunload',()=>{try{setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()-99999});}catch(e){}});
-  onSnapshot(collection(db,'presence'),snap=>{ presenceData={}; snap.forEach(d=>presenceData[d.id]=d.data()); drawPresence(myKey); },e=>console.warn('presence sub',e));
-  setInterval(()=>drawPresence(myKey),5000);
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden)beat(); });
+  onSnapshot(collection(db,'presence'),snap=>{ liveOn(true); presenceData={}; snap.forEach(d=>presenceData[d.id]=d.data()); drawPresence(myKey); },e=>console.warn('presence sub',e));
+  setInterval(()=>drawPresence(myKey),3000);
 }
 function drawPresence(myKey){
   const el=document.getElementById('presbar'); if(!el)return; el.style.display='block';
   let other=null; for(const k in presenceData){ if(k!==myKey)other=presenceData[k]; }
-  if(!other){ el.innerHTML='<span class="pdot off"></span>waiting for your partner\u2026'; return; }
-  const age=Date.now()-(other.t||0), online=age<40000, who=esc((other.name||'').split('@')[0]);
-  if(online) el.innerHTML='<span class="pdot on"></span>'+who+' \u00b7 '+esc(other.label||'here');
-  else { const mins=Math.max(1,Math.round(age/60000)); el.innerHTML='<span class="pdot off"></span>'+who+' \u00b7 last seen '+(mins<90?mins+'m ago':'a while ago'); }
+  let parts=['<span class="pdot on"></span>you'];
+  if(other){ const age=Date.now()-(other.t||0), online=age<60000, who=esc((other.name||'').split('@')[0]);
+    if(online) parts.push('<span class="pdot on"></span>'+who+' \u00b7 '+esc(other.label||'here'));
+    else { const mins=Math.max(1,Math.round(age/60000)); parts.push('<span class="pdot off"></span>'+who+' \u00b7 last seen '+(mins<90?mins+'m ago':'a while ago')); }
+  } else parts.push('<span class="pdot off"></span>waiting for partner\u2026');
+  el.innerHTML=parts.join(' &nbsp;&middot;&nbsp; ');
 }
 let chatWatchStarted=false, allChat=[], lastReadChat=0, unreadChat=0, chatMaxSeen=0;
 function notify(title,body){ if('Notification'in window && Notification.permission==='granted'){ try{new Notification('Pelooty \u00b7 '+title,{body:body});}catch(e){} } if(navigator.vibrate)navigator.vibrate([50,40,50]); }
