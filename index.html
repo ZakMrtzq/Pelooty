@@ -192,6 +192,8 @@
   .lb-h{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
   .lb-row{display:flex;justify-content:space-between;font-size:14px;padding:5px 0}
   .lb-row b{color:var(--accent)}
+  .lbv{display:flex;align-items:baseline;gap:6px}
+  .lbv i{font-style:normal;font-size:10px;color:var(--muted)}
   .lb-empty{font-size:13px;color:var(--muted)}
   .racts{display:flex;gap:9px;justify-content:center;margin-top:18px}
   .racts button{padding:11px 22px;border-radius:13px;font-size:14px;font-weight:800;transition:transform .12s}
@@ -656,24 +658,57 @@ function screenShake(){
 let gameTimers=[];
 function clearGameTimers(){gameTimers.forEach(t=>{clearTimeout(t);clearInterval(t)});gameTimers=[];}
 const sanit=e=>(e||'').replace(/[^a-z0-9]/gi,'_');
-async function saveBest(game,score,lower){
+async function saveBest(game,score,lower,extra){
   try{
     const ref=doc(db,'games',game); const snap=await getDoc(ref);
     const data=snap.exists()?snap.data():{bests:{}};
     if(!data.bests)data.bests={};
     const me=auth.currentUser?auth.currentUser.email:'me'; const k=sanit(me);
     const cur=data.bests[k]?data.bests[k].score:(lower?Infinity:-Infinity);
-    if((lower&&score<cur)||(!lower&&score>cur)){ data.bests[k]={name:me,score}; await setDoc(ref,data,{merge:true}); }
+    if((lower&&score<cur)||(!lower&&score>cur)){ data.bests[k]=Object.assign({name:me,score:score},extra||{}); await setDoc(ref,data,{merge:true}); }
     return data.bests;
   }catch(e){return null;}
 }
 async function getBests(game){try{const snap=await getDoc(doc(db,'games',game));return snap.exists()?(snap.data().bests||{}):{};}catch(e){return {};}}
-function bestsHTML(bests,lower,unit){
+function bestsHTML(bests,lower,unit,fmt){
   const arr=Object.values(bests||{}).sort((a,b)=>lower?a.score-b.score:b.score-a.score);
   if(!arr.length)return '<div class="lb-empty">No scores yet \u2014 be the first.</div>';
-  return arr.map((r,i)=>'<div class="lb-row"><span>'+(i===0?'\uD83C\uDFC6':(i+1)+'.')+' '+esc((r.name||'').split('@')[0])+'</span><b>'+r.score+(unit||'')+'</b></div>').join('');
+  return arr.map((r,i)=>'<div class="lb-row"><span>'+(i===0?'\uD83C\uDFC6':(i+1)+'.')+' '+esc((r.name||'').split('@')[0])+'</span><span class="lbv"><b>'+r.score+(unit||'')+'</b>'+((fmt?fmt(r):'')||'')+'</span></div>').join('');
 }
 
+async function recordAttempt(game,score,lower,extra){
+  const me=auth.currentUser?auth.currentUser.email:'me'; const k=sanit(me);
+  let data={bests:{},history:{}};
+  try{const snap=await getDoc(doc(db,'games',game)); if(snap.exists())data=snap.data()||data;}catch(e){}
+  if(!data.bests)data.bests={}; if(!data.history)data.history={};
+  const entry=Object.assign({s:score,t:Date.now()},extra||{});
+  const myHist=((data.history[k]||[]).concat([entry])).slice(-12);
+  data.history[k]=myHist;
+  const upd={history:{}}; upd.history[k]=myHist;
+  const cur=data.bests[k]?data.bests[k].score:(lower?Infinity:-Infinity);
+  if((lower&&score<cur)||(!lower&&score>cur)){ data.bests[k]=Object.assign({name:me,score:score},extra||{}); upd.bests={}; upd.bests[k]=data.bests[k]; }
+  try{ await setDoc(doc(db,'games',game),upd,{merge:true}); }catch(e){console.warn(e);}
+  return data;
+}
+function holdHistHTML(data){
+  const hist=data.history||{}, bests=data.bests||{};
+  const keys=Object.keys(hist).filter(k=>(hist[k]||[]).length);
+  if(!keys.length)return '';
+  keys.sort((a,b)=>{const la=hist[a][hist[a].length-1].t||0,lb=hist[b][hist[b].length-1].t||0;return lb-la;});
+  let h='<div class="histwrap"><div class="lb-h" style="margin:16px 2px 8px">Recent tries</div>';
+  keys.forEach(k=>{ const nm=esc(((bests[k]&&bests[k].name)||k).split('@')[0]);
+    const rows=hist[k].slice().reverse().map(r=>'<div class="hrow"><span>'+r.s+' ms'+(r.target?' @ '+(r.target/1000).toFixed(2)+'s':'')+'</span><span>'+fmtDE(r.t)+'</span></div>').join('');
+    h+='<div class="histuser"><div class="hu">'+nm+'</div>'+rows+'</div>'; });
+  return h+'</div>';
+}
+function holdBoardsHTML(data,title,fmt){
+  return '<div class="lb"><div class="lb-h">'+title+'</div>'+bestsHTML(data.bests||{},true,' ms',fmt)+'</div>'+holdHistHTML(data);
+}
+async function loadHoldBoard(game,resId,title,fmt){
+  const res=document.getElementById(resId); if(!res)return;
+  try{const snap=await getDoc(doc(db,'games',game)); const d=snap.exists()?(snap.data()||{}):{};
+    if(document.getElementById(resId))document.getElementById(resId).innerHTML=holdBoardsHTML(d,title,fmt);}catch(e){}
+}
 function gamesCardHTML(){
   return '<button class="gcard" id="gamesBtn" style="animation-delay:.42s"><div class="gico">\uD83C\uDFAE</div><div class="gtxt"><div class="gt">Games</div><div class="gs">Take a break \u00b7 beat each other\u2019s scores</div></div><div class="chev">\u203a</div></button>';
 }
@@ -1038,6 +1073,7 @@ function playHold(){
     '<button class="holdpad" id="hpad"><span class="hbig" id="hbig">Hold me</span><span class="hsm" id="hsm">press & keep holding</span></button>'+
     '<div id="hres"></div></div>';
   document.getElementById('hback').onclick=renderGames;
+  loadHoldBoard('steadyhold','hres','Best (closest to 10s)');
   const pad=document.getElementById('hpad'),big=document.getElementById('hbig'),sm=document.getElementById('hsm');
   let t0=0,iv=null,holding=false;
   pad.addEventListener('contextmenu',e=>e.preventDefault());
@@ -1052,9 +1088,9 @@ function playHold(){
     if(dt<1500){ big.textContent='Hold me'; sm.textContent='too quick \u2014 hold longer'; sound('tick'); return; }
     const dev=Math.round(Math.abs(dt-TARGET)); sound(dev<300?'success':'pop');
     big.textContent=(dt/1000).toFixed(2)+'s'; sm.textContent='off by '+dev+' ms';
-    const bests=await saveBest('steadyhold',dev,true)||await getBests('steadyhold');
+    const d=await recordAttempt('steadyhold',dev,true);
     const res=document.getElementById('hres');
-    if(res)res.innerHTML='<div class="lb"><div class="lb-h">Best (closest to 10s)</div>'+bestsHTML(bests,true,' ms')+'</div>';
+    if(res)res.innerHTML=holdBoardsHTML(d,'Best (closest to 10s)');
   }
   pad.addEventListener('pointerup',finish);
   pad.addEventListener('pointercancel',()=>cancelHold('interrupted \u2014 try again'));
@@ -1071,6 +1107,7 @@ function playHoldRandom(){
     '<button class="holdpad" id="rh-pad"><span class="hbig" id="rh-big">Hold me</span><span class="hsm" id="rh-sm">press & keep holding</span></button>'+
     '<div id="rh-res"></div></div>';
   document.getElementById('rhback').onclick=renderGames;
+  loadHoldBoard('randomhold','rh-res','Best (closest to target)',r=>r.target?'<i>@ '+(r.target/1000).toFixed(2)+'s</i>':'');
   const pad=document.getElementById('rh-pad'),big=document.getElementById('rh-big'),sm=document.getElementById('rh-sm'),tl=document.getElementById('rh-t');
   const fmtT=()=> (TARGET/1000).toFixed(2)+'s';
   const showT=lab=>{ if(tl)tl.innerHTML='\uD83C\uDFB2 '+(lab||'Target')+': <b>'+fmtT()+'</b>'; };
@@ -1088,9 +1125,9 @@ function playHoldRandom(){
     if(dt<800){ big.textContent='Hold me'; sm.textContent='too quick \u2014 hold longer'; sound('tick'); return; }
     const dev=Math.round(Math.abs(dt-TARGET)); sound(dev<250?'success':'pop');
     big.textContent=(dt/1000).toFixed(2)+'s'; sm.textContent='off by '+dev+' ms \u00b7 target was '+fmtT();
-    const bests=await saveBest('randomhold',dev,true)||await getBests('randomhold');
+    const d=await recordAttempt('randomhold',dev,true,{target:TARGET});
     const res=document.getElementById('rh-res');
-    if(res)res.innerHTML='<div class="lb"><div class="lb-h">Best (closest to target)</div>'+bestsHTML(bests,true,' ms')+'</div>';
+    if(res)res.innerHTML=holdBoardsHTML(d,'Best (closest to target)',r=>r.target?'<i>@ '+(r.target/1000).toFixed(2)+'s</i>':'');
     TARGET=roll(); showT('New target');
   }
   pad.addEventListener('pointerup',finish);
