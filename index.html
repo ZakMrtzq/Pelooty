@@ -683,12 +683,14 @@ function renderGames(){
     '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
     kegelCard()+
     '<button class="gcard play" id="g-hold"><div class="gico">\u23F1\uFE0F</div><div class="gtxt"><div class="gt">Steady Hold</div><div class="gs">Release at exactly 10s \u2014 by feel</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play" id="g-rhold"><div class="gico">\uD83C\uDFB2</div><div class="gtxt"><div class="gt">Random Hold</div><div class="gs">3\u201310s \u00b7 new target every try</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play" id="g-ttt"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Tic-Tac-Toe</div><div class="gs">Live</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it changes</div></div><div class="chev">\u203a</div></button>'+
     '</div>';
   document.getElementById('gback').onclick=renderHome;
   document.getElementById('g-keg').onclick=()=>renderKegel();
   document.getElementById('g-hold').onclick=playHold;
+  document.getElementById('g-rhold').onclick=playHoldRandom;
   document.getElementById('g-ttt').onclick=renderTTT;
   document.getElementById('g-rxn').onclick=playReaction;
 }
@@ -1053,6 +1055,43 @@ function playHold(){
     const bests=await saveBest('steadyhold',dev,true)||await getBests('steadyhold');
     const res=document.getElementById('hres');
     if(res)res.innerHTML='<div class="lb"><div class="lb-h">Best (closest to 10s)</div>'+bestsHTML(bests,true,' ms')+'</div>';
+  }
+  pad.addEventListener('pointerup',finish);
+  pad.addEventListener('pointercancel',()=>cancelHold('interrupted \u2014 try again'));
+  pad.addEventListener('pointerleave',()=>{ if(holding)finish(); });
+}
+
+function playHoldRandom(){
+  view={screen:"game",dayId:null}; clearSubs(); clearGameTimers();
+  const roll=()=>Math.round((3000+Math.random()*7000)/10)*10;
+  let TARGET=roll();
+  app.innerHTML='<div class="screen"><button class="back" id="rhback">\u2039 Games</button><div class="shead"><h2>Random Hold \uD83C\uDFB2</h2></div>'+
+    '<p class="kintro">A new target every try, anywhere from <b>3.00s</b> to <b>10.00s</b>. Press and hold \u2014 the count hides after 1.5s \u2014 release right on the number.</p>'+
+    '<div class="tstatus" id="rh-t"></div>'+
+    '<button class="holdpad" id="rh-pad"><span class="hbig" id="rh-big">Hold me</span><span class="hsm" id="rh-sm">press & keep holding</span></button>'+
+    '<div id="rh-res"></div></div>';
+  document.getElementById('rhback').onclick=renderGames;
+  const pad=document.getElementById('rh-pad'),big=document.getElementById('rh-big'),sm=document.getElementById('rh-sm'),tl=document.getElementById('rh-t');
+  const fmtT=()=> (TARGET/1000).toFixed(2)+'s';
+  const showT=lab=>{ if(tl)tl.innerHTML='\uD83C\uDFB2 '+(lab||'Target')+': <b>'+fmtT()+'</b>'; };
+  showT();
+  let t0=0,iv=null,holding=false;
+  pad.addEventListener('contextmenu',e=>e.preventDefault());
+  function cancelHold(msg){ if(!holding)return; holding=false; if(iv)clearInterval(iv); pad.classList.remove('arm'); big.textContent='Hold me'; sm.textContent=msg||'press & keep holding'; }
+  pad.addEventListener('pointerdown',e=>{ e.preventDefault(); if(holding)return; holding=true; t0=performance.now(); pad.classList.add('arm'); sound('tap'); sm.textContent='release at '+fmtT();
+    iv=setInterval(()=>{ const el=performance.now()-t0;
+      if(el<1500){ big.textContent=(el/1000).toFixed(1)+'s'; }
+      else { big.textContent='\u00b7 \u00b7 \u00b7'; sm.textContent='trust your feel\u2026'; }
+    },90); gameTimers.push(iv); });
+  async function finish(e){ if(!holding)return; holding=false; if(iv)clearInterval(iv); pad.classList.remove('arm');
+    const dt=performance.now()-t0;
+    if(dt<800){ big.textContent='Hold me'; sm.textContent='too quick \u2014 hold longer'; sound('tick'); return; }
+    const dev=Math.round(Math.abs(dt-TARGET)); sound(dev<250?'success':'pop');
+    big.textContent=(dt/1000).toFixed(2)+'s'; sm.textContent='off by '+dev+' ms \u00b7 target was '+fmtT();
+    const bests=await saveBest('randomhold',dev,true)||await getBests('randomhold');
+    const res=document.getElementById('rh-res');
+    if(res)res.innerHTML='<div class="lb"><div class="lb-h">Best (closest to target)</div>'+bestsHTML(bests,true,' ms')+'</div>';
+    TARGET=roll(); showT('New target');
   }
   pad.addEventListener('pointerup',finish);
   pad.addEventListener('pointercancel',()=>cancelHold('interrupted \u2014 try again'));
