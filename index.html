@@ -66,7 +66,15 @@
   .wk .lab{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--muted);padding:0 7px;min-width:62px;text-align:center}
   .wk .lab b{color:var(--ink)}
   .clockbar{text-align:center;font-size:12px;color:var(--muted);letter-spacing:.04em;padding:9px 0 2px}
-  .presbar{text-align:center;font-size:11px;color:var(--muted);padding:2px 14px 10px;display:none;line-height:1.5}
+  .presbar{display:none;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;padding:2px 12px 10px;font-size:10.5px;color:var(--muted)}
+  .pchip{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px 11px;max-width:100%;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+  .pchip b{color:var(--ink);font-weight:650}
+  .pchip .plbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:52vw}
+  .pchip .pdot{margin-right:0}
+  .pchip.perr{border-color:#7a3b3b;color:#e8a0a0}
+  .pchip.psend{border-color:var(--accent);color:var(--ink);cursor:pointer;transition:transform .1s}
+  .pchip.psend:active{transform:scale(.94)}
+  .stoast{position:fixed;top:72px;left:50%;transform:translateX(-50%);z-index:9500;background:var(--card2);border:1px solid var(--accent);border-radius:999px;padding:8px 16px;font-size:13px;font-weight:700;box-shadow:0 10px 28px rgba(0,0,0,.45);pointer-events:none}
   .pdot{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;vertical-align:middle}
   .pdot.on{background:var(--done);animation:pulse 2.4s infinite}
   .pdot.off{background:#5b4f58}
@@ -335,7 +343,7 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
 function showFatal(msg){ try{ const a=document.getElementById('app'); if(a)a.innerHTML='<div style="padding:24px;color:#FF8567;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.5">App error \u2014 send this to fix it:\n\n'+String(msg)+'</div>'; }catch(_){ } }
 window.addEventListener('error',e=>showFatal((e&&e.message)||(e&&e.error)||'error'));
@@ -716,6 +724,7 @@ function renderGames(){
   view={screen:"games",dayId:null}; clearSubs(); clearGameTimers(); liveOn(true);
   app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Home</button>'+
     '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
+    '<p class="kintro" id="splashTally"></p>'+
     kegelCard()+
     '<button class="gcard play" id="g-hold"><div class="gico">\u23F1\uFE0F</div><div class="gtxt"><div class="gt">Steady Hold</div><div class="gs">Release at exactly 10s \u2014 by feel</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play" id="g-rhold"><div class="gico">\uD83C\uDFB2</div><div class="gtxt"><div class="gt">Random Hold</div><div class="gs">3\u201310s \u00b7 new target every try</div></div><div class="chev">\u203a</div></button>'+
@@ -728,6 +737,7 @@ function renderGames(){
   document.getElementById('g-rhold').onclick=playHoldRandom;
   document.getElementById('g-ttt').onclick=renderTTT;
   document.getElementById('g-rxn').onclick=playReaction;
+  {const st=document.getElementById('splashTally'); if(st)st.innerHTML=splashTallyHTML(sanit(auth.currentUser?auth.currentUser.email:''));}
 }
 
 function playReaction(){
@@ -990,7 +1000,7 @@ async function finishKegel(d){
 function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
 let clockStarted=false;
 function startClock(){ if(clockStarted)return; clockStarted=true; const tick=()=>{const el=document.getElementById('clockNow'); if(el)el.textContent=fmtNow();}; tick(); setInterval(tick,1000); }
-let presenceStarted=false, presenceData={};
+let presenceStarted=false, presenceData={}, presenceErr='';
 function presenceLabel(){
   if(view.screen==='session'){const d=PROGRAM.find(x=>x.id===view.dayId);return 'Week '+WEEK+' \u00b7 '+(d?d.name:'Day '+view.dayId);}
   return ({home:'Home',games:'Games',game:'Playing a game',kegel:'Kegel Trainer',chat:'Chat',calendar:'Calendar'}[view.screen])||'In the app';
@@ -998,21 +1008,34 @@ function presenceLabel(){
 function startPresence(){
   if(presenceStarted)return; presenceStarted=true;
   const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
-  const beat=()=>{ setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()}).catch(e=>console.warn('presence',e)); };
+  const beat=()=>{ setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()})
+    .then(()=>{ if(presenceErr){presenceErr='';drawPresence(myKey);} })
+    .catch(e=>{ presenceErr=(e&&e.code)||'write failed'; drawPresence(myKey); }); };
   beat(); setInterval(beat,3000);
+  deleteDoc(doc(db,'presence','state')).catch(()=>{});
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden)beat(); });
-  onSnapshot(collection(db,'presence'),snap=>{ liveOn(true); presenceData={}; snap.forEach(d=>presenceData[d.id]=d.data()); drawPresence(myKey); },e=>console.warn('presence sub',e));
+  window.addEventListener('focus',beat);
+  onSnapshot(collection(db,'presence'),snap=>{ liveOn(true); presenceData={};
+    snap.forEach(d=>{ const v=d.data(); if(v && typeof v.t==='number' && v.name) presenceData[d.id]=v; });
+    drawPresence(myKey); },e=>{ presenceErr=(e&&e.code)||'sync error'; drawPresence(myKey); });
   setInterval(()=>drawPresence(myKey),3000);
 }
 function drawPresence(myKey){
-  const el=document.getElementById('presbar'); if(!el)return; el.style.display='block';
-  let other=null; for(const k in presenceData){ if(k!==myKey)other=presenceData[k]; }
-  let parts=['<span class="pdot on"></span>you'];
+  const el=document.getElementById('presbar'); if(!el)return; el.style.display='flex';
+  let other=null; for(const k in presenceData){ if(k!==myKey && (!other || (presenceData[k].t||0)>(other.t||0))) other=presenceData[k]; }
+  let h='<span class="pchip"><span class="pdot on"></span><b>you</b></span>';
   if(other){ const age=Date.now()-(other.t||0), online=age<60000, who=esc((other.name||'').split('@')[0]);
-    if(online) parts.push('<span class="pdot on"></span>'+who+' \u00b7 '+esc(other.label||'here'));
-    else { const mins=Math.max(1,Math.round(age/60000)); parts.push('<span class="pdot off"></span>'+who+' \u00b7 last seen '+(mins<90?mins+'m ago':'a while ago')); }
-  } else parts.push('<span class="pdot off"></span>waiting for partner\u2026');
-  el.innerHTML=parts.join(' &nbsp;&middot;&nbsp; ');
+    if(online) h+='<span class="pchip"><span class="pdot on"></span><b>'+who+'</b><span class="plbl">'+esc(other.label||'online')+'</span></span>';
+    else{ const mins=Math.max(1,Math.round(age/60000));
+      const when=mins<60?(mins+'m ago'):fmtDE(other.t);
+      h+='<span class="pchip"><span class="pdot off"></span><b>'+who+'</b><span class="plbl">last seen '+when+'</span></span>'; }
+  } else h+='<span class="pchip"><span class="pdot off"></span>waiting for partner\u2026</span>';
+  const oOnline=other && (Date.now()-(other.t||0))<60000;
+  if(oOnline){ const cd=Math.ceil((splashCoolUntil-Date.now())/1000);
+    h+='<button class="pchip psend" id="splashBtn">'+(cd>0?'\uD83D\uDCA6 '+cd+'s':'\uD83D\uDCA6 Splash')+'</button>'; }
+  if(presenceErr)h+='<span class="pchip perr"><span class="pdot off"></span>'+esc(presenceErr)+'</span>';
+  el.innerHTML=h;
+  const sb=document.getElementById('splashBtn'); if(sb)sb.onclick=sendSplash;
 }
 let chatWatchStarted=false, allChat=[], lastReadChat=0, unreadChat=0, chatMaxSeen=0;
 function notify(title,body){ sound('msg'); if('Notification'in window && Notification.permission==='granted'){ try{new Notification('Pelooty \u00b7 '+title,{body:body});}catch(e){} } if(navigator.vibrate)navigator.vibrate([50,40,50]); }
@@ -1175,6 +1198,53 @@ function sound(name){
     case 'relax': tone(300,240,0.5,'sine',0.07); break;
   } }catch(e){}
 }
+let splashSeenT=0, splashCoolUntil=0, splashCounts={}, splashWatchStarted=false;
+function keyName(k){ return esc((k||'').split('_gmail')[0].split('_yahoo')[0].split('_hotmail')[0].replace(/_/g,'.')); }
+function startSplashWatch(){
+  if(splashWatchStarted)return; splashWatchStarted=true;
+  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
+  onSnapshot(doc(db,'games','splash'),snap=>{
+    const d=snap.exists()?(snap.data()||{}):{};
+    splashCounts=d.counts||{};
+    const ev=d.ev;
+    if(ev && typeof ev.t==='number' && ev.t>splashSeenT){
+      const isNew=splashSeenT>0; splashSeenT=ev.t;
+      if(isNew && ev.from!==myKey) receiveSplash(ev,myKey);
+    }
+    const st=document.getElementById('splashTally'); if(st)st.innerHTML=splashTallyHTML(myKey);
+  },e=>console.warn('splash',e));
+}
+function receiveSplash(ev,myKey){
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!reduce)bigSplash(document.body);
+  if(navigator.vibrate)navigator.vibrate([70,40,90]);
+  sound('pop');
+  splashToast('\uD83D\uDCA6 Splash from '+esc((ev.name||'').split('@')[0]||keyName(ev.from))+'!');
+  const upd={counts:{}}; upd.counts[myKey]=(splashCounts[myKey]||0)+1;
+  setDoc(doc(db,'games','splash'),upd,{merge:true}).catch(()=>{});
+}
+function sendSplash(){
+  const now=Date.now(); if(now<splashCoolUntil)return;
+  splashCoolUntil=now+30000;
+  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
+  setDoc(doc(db,'games','splash'),{ev:{from:myKey,name:me,t:now}},{merge:true})
+    .then(()=>{ sound('tap'); splashToast('\uD83D\uDCA6 sent!'); })
+    .catch(()=>{ splashCoolUntil=0; splashToast('couldn\u2019t send \u2014 try again'); });
+  const myK=sanit(me); void myK;
+  drawPresence(sanit(me));
+}
+function splashToast(txt){
+  const t=document.createElement('div'); t.className='stoast'; t.textContent=txt; document.body.appendChild(t);
+  t.animate([{opacity:0,transform:'translateX(-50%) translateY(-8px)'},{opacity:1,transform:'translateX(-50%) translateY(0)'}],{duration:240,easing:'ease-out',fill:'forwards'});
+  setTimeout(()=>{ t.animate([{opacity:1},{opacity:0}],{duration:320,fill:'forwards'}); setTimeout(()=>t.remove(),340); },1900);
+}
+function splashTallyHTML(myKey){
+  const keys=Object.keys(splashCounts||{}); if(!keys.length)return '\uD83C\uDF0A No splashes yet \u2014 catch each other online.';
+  const mine=splashCounts[myKey]||0;
+  let otherK=null; keys.forEach(k=>{ if(k!==myKey)otherK=k; });
+  const theirs=otherK?(splashCounts[otherK]||0):0;
+  return '\uD83C\uDF0A Splashes received \u2014 you: <b>'+mine+'</b>'+(otherK?' \u00b7 '+keyName(otherK)+': <b>'+theirs+'</b>':'');
+}
 function esc(s){return (s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function setWeek(w){if(view.screen!=="home"&&view.screen!=="session")return;WEEK=Math.max(1,w);document.getElementById('wkNum').textContent=WEEK;setDoc(doc(db,'meta','app'),{week:WEEK},{merge:true}).catch(()=>{});if(view.screen==="home")renderHome();else openDay(view.dayId);}
 document.getElementById('wkUp').onclick=()=>setWeek(WEEK+1);
@@ -1200,7 +1270,7 @@ function signInScreen(){
   app.innerHTML='<div class="center"><h2>Pelooty 🍑</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
   document.getElementById('gin').onclick=doSignIn;
 }
-onAuthStateChanged(auth,async user=>{ try{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); startChatWatch(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
+onAuthStateChanged(auth,async user=>{ try{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); startChatWatch(); startSplashWatch(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
 </script>
 </body>
 </html>
