@@ -410,35 +410,35 @@
   .foot{text-align:center;color:var(--muted);font-size:11px;margin-top:28px;line-height:1.6;opacity:.6}
 
   /* ===== intro / fx ===== */
-  @keyframes characterFall{0%{transform:translateY(-65vh) rotate(-18deg) scale(.5);opacity:0}62%{transform:translateY(14px) rotate(7deg) scale(1.13);opacity:1}78%{transform:translateY(-22px) rotate(-3deg) scale(.96)}100%{transform:translateY(0) rotate(0) scale(1)}}
-  @keyframes elephantFall{0%{transform:translateY(-70vh) scale(.42);opacity:0}58%{transform:translateY(24px) scale(1.28);opacity:1}72%{transform:translateY(-9px) scale(.93)}84%{transform:translateY(5px) scale(1.06)}100%{transform:none}}
-  @keyframes waveFlood{0%{transform:translateY(112%) scaleX(.72)}62%{transform:translateY(-5%) scaleX(1.08)}78%{transform:translateY(2%) scaleX(.98)}100%{transform:translateY(0) scaleX(1)}}
-  @keyframes waveRoll{0%,100%{transform:translateX(-4%) rotate(-1deg)}50%{transform:translateX(4%) rotate(1deg)}}
-  @keyframes impactBloom{0%{transform:scale(.12);opacity:0}35%{opacity:.9}100%{transform:scale(8);opacity:0}}
-  @keyframes introQuake{0%,100%{transform:none}18%{transform:translate(-8px,5px)}34%{transform:translate(7px,-4px)}52%{transform:translate(-5px,3px)}70%{transform:translate(3px,-2px)}}
-  @keyframes lockupIn{from{opacity:0;transform:translateY(18px);letter-spacing:.34em}to{opacity:1;transform:none;letter-spacing:.22em}}
-  @keyframes introBubble{0%{transform:translateY(12vh) scale(.4);opacity:0}25%{opacity:.7}100%{transform:translateY(-105vh) scale(1.2);opacity:0}}
-  #intro{position:fixed;inset:0;z-index:10000;overflow:hidden;display:grid;place-items:center;background:radial-gradient(110% 90% at 50% 35%,#172944 0%,#0B0F14 70%);pointer-events:none;isolation:isolate;transition:opacity .55s ease,filter .55s ease}
-  #intro.leaving{opacity:0;filter:saturate(.7) brightness(1.15)}
-  #intro.elephant.impact{animation:introQuake .58s cubic-bezier(.2,.8,.3,1)}
-  .login-character{position:relative;z-index:5;font-size:clamp(96px,28vw,176px);line-height:1;opacity:0;filter:drop-shadow(0 24px 24px rgba(0,0,0,.38));will-change:transform,opacity}
-  #intro.arrive .login-character{animation:characterFall .88s cubic-bezier(.18,.82,.28,1.18) forwards}
-  #intro.elephant.arrive .login-character{animation-name:elephantFall;animation-duration:1.02s;filter:drop-shadow(0 30px 30px rgba(0,0,0,.5))}
-  .login-impact{position:absolute;z-index:3;left:50%;top:52%;width:72px;height:24px;margin:-12px 0 0 -36px;border:3px solid rgba(203,244,255,.84);border-radius:50%;opacity:0}
-  #intro.impact .login-impact{animation:impactBloom .9s ease-out forwards}
-  .login-wave{position:absolute;z-index:2;left:-25vw;bottom:-18vh;width:150vw;height:138vh;transform:translateY(112%) scaleX(.72);border-radius:48% 52% 0 0/12% 15% 0 0;background:linear-gradient(165deg,#D6F7FF 0%,#78DCFF 18%,#5689F2 55%,#253C88 100%);box-shadow:0 -18px 80px rgba(114,213,255,.5);will-change:transform}
-  .login-wave:before,.login-wave:after{content:"";position:absolute;left:-4%;top:-6vh;width:108%;height:14vh;border-radius:50%;background:rgba(219,248,255,.8);animation:waveRoll 1.75s ease-in-out infinite}
-  .login-wave:after{left:8%;top:-2.5vh;width:84%;height:8vh;background:rgba(91,142,243,.44);animation-direction:reverse;animation-duration:1.25s}
-  #intro.flood .login-wave{animation:waveFlood 1.05s cubic-bezier(.12,.78,.26,1.02) forwards}
-  #intro.elephant.flood .login-wave{animation-duration:.82s;box-shadow:0 -28px 110px rgba(162,229,255,.72)}
-  .login-lockup{position:absolute;z-index:6;left:20px;right:20px;top:66%;text-align:center;color:#06101C;opacity:0;text-shadow:0 1px 0 rgba(255,255,255,.18)}
-  #intro.settled .login-lockup{animation:lockupIn .6s cubic-bezier(.2,.8,.3,1) forwards}
-  .login-lockup b{display:block;font-size:clamp(25px,7vw,42px);font-weight:950;letter-spacing:.22em;text-indent:.22em}
-  .login-lockup span{display:block;margin-top:9px;font-size:11px;font-weight:850;letter-spacing:.16em;text-transform:uppercase;opacity:.72}
-  .login-bubble{position:absolute;z-index:4;bottom:-30px;border:1px solid rgba(225,249,255,.76);border-radius:50%;background:rgba(217,247,255,.2);box-shadow:inset 2px 2px 8px rgba(255,255,255,.35);animation:introBubble 2.2s ease-out forwards}
+  @keyframes characterCharge{0%{transform:translateY(-34px) scale(.54) rotate(-10deg);opacity:0}58%{transform:translateY(6px) scale(1.12) rotate(4deg);opacity:1}82%{transform:translateY(-3px) scale(.96) rotate(-2deg)}100%{transform:none;opacity:1}}
+  @keyframes characterBurst{0%{transform:none;opacity:1}13%{transform:scale(1.18,.72) translateY(12px)}34%{transform:scale(.88,1.24) translateY(-14px)}58%{transform:scale(1.06,.95) translateY(2px)}100%{transform:none;opacity:1}}
+  @keyframes elephantBurst{0%{transform:none;opacity:1}10%{transform:scale(1.3,.62) translateY(18px)}28%{transform:scale(.82,1.32) translateY(-20px)}52%{transform:scale(1.12,.9) translateY(5px)}100%{transform:none;opacity:1}}
+  @keyframes waterCover{0%{transform:translate(-50%,-50%) scale(.015) rotate(-9deg);opacity:0}10%{opacity:1}58%{transform:translate(-50%,-50%) scale(4.2) rotate(4deg);opacity:1}78%{transform:translate(-50%,-50%) scale(5.8) rotate(-2deg);opacity:1}100%{transform:translate(-50%,-50%) scale(5.55) rotate(0);opacity:1}}
+  @keyframes elephantWaterCover{0%{transform:translate(-50%,-50%) scale(.02);opacity:0}8%{opacity:1}48%{transform:translate(-50%,-50%) scale(5.8) rotate(3deg);opacity:1}70%{transform:translate(-50%,-50%) scale(6.5) rotate(-1deg);opacity:1}100%{transform:translate(-50%,-50%) scale(6.15);opacity:1}}
+  @keyframes crownBurst{0%{transform:translate(-50%,-50%) scale(.02) rotate(-12deg);opacity:0}14%{opacity:1}58%{transform:translate(-50%,-50%) scale(1.18) rotate(5deg);opacity:.98}100%{transform:translate(-50%,-50%) scale(2.7) rotate(13deg);opacity:0}}
+  @keyframes ringBurst{0%{transform:translate(-50%,-50%) scale(.08);opacity:0}16%{opacity:.94}100%{transform:translate(-50%,-50%) scale(9.5);opacity:0;border-width:1px}}
+  @keyframes burstJet{0%{transform:translate(-50%,-50%) rotate(var(--rot)) scale(.12,.28);opacity:0}10%{opacity:1}42%{opacity:.94}100%{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) rotate(var(--rot)) scale(.35,1.25);opacity:0}}
+  @keyframes introQuake{0%,100%{transform:none}12%{transform:translate(-11px,7px) rotate(-.5deg)}25%{transform:translate(9px,-6px) rotate(.45deg)}40%{transform:translate(-7px,4px)}57%{transform:translate(5px,-3px)}75%{transform:translate(-2px,2px)}}
+  #intro{position:fixed;inset:0;z-index:10000;overflow:hidden;display:grid;place-items:center;background:radial-gradient(circle at 50% 50%,#183452 0%,#0A111D 62%,#05080D 100%);pointer-events:none;isolation:isolate;transition:opacity .52s ease,filter .52s ease}
+  #intro.leaving{opacity:0;filter:saturate(.65) brightness(1.2)}
+  #intro.elephant.impact{animation:introQuake .72s cubic-bezier(.2,.8,.3,1)}
+  .burst-sheet{position:absolute;z-index:1;left:50%;top:50%;width:36vmax;height:36vmax;border-radius:46% 54% 49% 51%/53% 44% 56% 47%;opacity:0;transform:translate(-50%,-50%) scale(.015);background:radial-gradient(circle at 50% 50%,#E4FBFF 0 3%,#99E8FF 7%,#4CBDEB 24%,#247BC3 48%,#164D92 72%,#0B2B61 100%);box-shadow:0 0 0 2px rgba(222,250,255,.7),0 0 80px 20px rgba(78,192,238,.48);will-change:transform,opacity}
+  #intro.impact .burst-sheet{animation:waterCover .92s cubic-bezier(.08,.78,.18,1) forwards}
+  #intro.elephant.impact .burst-sheet{animation-name:elephantWaterCover;animation-duration:.74s}
+  .burst-crown{position:absolute;z-index:2;left:50%;top:50%;width:min(72vmin,640px);height:min(72vmin,640px);opacity:0;transform:translate(-50%,-50%) scale(.02);clip-path:polygon(50% 0,57% 29%,73% 8%,70% 35%,100% 24%,77% 46%,98% 58%,70% 59%,82% 91%,59% 70%,50% 100%,43% 70%,17% 93%,31% 60%,0 62%,26% 47%,3% 29%,34% 36%,27% 6%,45% 30%);background:radial-gradient(circle,rgba(237,253,255,.96) 0 9%,rgba(132,224,255,.92) 25%,rgba(50,154,221,.76) 53%,rgba(21,91,166,.08) 72%);filter:drop-shadow(0 0 22px rgba(179,239,255,.72));will-change:transform,opacity}
+  #intro.impact .burst-crown{animation:crownBurst .86s cubic-bezier(.08,.78,.2,1) both}
+  #intro.elephant.impact .burst-crown{animation-duration:.7s}
+  .burst-ring{position:absolute;z-index:4;left:50%;top:50%;width:9vmin;height:9vmin;border:clamp(3px,1.1vmin,8px) solid rgba(226,252,255,.9);border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.08);box-shadow:0 0 28px rgba(181,239,255,.7)}
+  #intro.impact .burst-ring{animation:ringBurst .78s ease-out both}
+  #intro.impact .burst-ring.r2{animation-delay:.09s;animation-duration:.9s;border-color:rgba(89,198,242,.72)}
+  .burst-jet{position:absolute;z-index:3;left:50%;top:50%;width:var(--size);height:calc(var(--size) * 3.2);border-radius:70% 35% 66% 38%;opacity:0;transform-origin:50% 50%;background:linear-gradient(165deg,rgba(235,253,255,.98),rgba(93,205,244,.88) 35%,rgba(26,110,190,.52));box-shadow:inset 2px 2px 5px rgba(255,255,255,.6),0 0 18px rgba(111,220,255,.55);animation:burstJet var(--duration) cubic-bezier(.08,.68,.18,1) var(--delay) both;will-change:transform,opacity}
+  .login-character{position:relative;z-index:6;font-size:clamp(104px,30vw,188px);line-height:1;opacity:0;filter:drop-shadow(0 24px 24px rgba(0,0,0,.42));will-change:transform,opacity}
+  #intro.arrive .login-character{animation:characterCharge .48s cubic-bezier(.18,.82,.28,1.18) forwards}
+  #intro.impact .login-character{animation:characterBurst .74s cubic-bezier(.16,.86,.26,1.12) forwards;filter:drop-shadow(0 20px 20px rgba(4,25,53,.46)) drop-shadow(0 0 18px rgba(223,251,255,.64))}
+  #intro.elephant.impact .login-character{animation-name:elephantBurst;animation-duration:.82s;filter:drop-shadow(0 28px 28px rgba(0,0,0,.55)) drop-shadow(0 0 24px rgba(223,251,255,.72))}
   #intro.reduce .login-character{opacity:1;transform:none;animation:none}
-  #intro.reduce .login-wave{transform:none;animation:none}
-  #intro.reduce .login-lockup{opacity:1;animation:none}
+  #intro.reduce .burst-sheet{opacity:1;transform:translate(-50%,-50%) scale(6);animation:none}
+  #intro.reduce .burst-crown,#intro.reduce .burst-ring,#intro.reduce .burst-jet{display:none}
   #fx{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
   .fxbit{position:fixed;will-change:transform,opacity}
   .water-drop{position:fixed;border-radius:68% 42% 64% 38%;background:linear-gradient(145deg,rgba(218,247,255,.96),rgba(90,165,235,.68));box-shadow:inset 2px 2px 4px rgba(255,255,255,.55),0 0 12px rgba(114,213,255,.3);will-change:transform,opacity}
@@ -861,16 +861,21 @@ let introShown=false;
 function introSplash(){
   if(introShown)return; introShown=true;
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches,character=randEmoji(),type=character==='\uD83D\uDC18'?'elephant':character==='\uD83D\uDC39'?'hamster':'peach';
-  const captions={peach:'Peach mode ready',hamster:'Hamster energy online',elephant:'Elephant impact engaged'},ov=document.createElement('div');ov.id='intro';ov.className=type;ov.setAttribute('aria-hidden','true');
-  ov.innerHTML='<div class="login-wave"></div><div class="login-impact"></div><div class="login-character" role="img">'+character+'</div><div class="login-lockup"><b>PELOOTY</b><span>'+captions[type]+'</span></div>';
+  const ov=document.createElement('div');ov.id='intro';ov.className=type;ov.setAttribute('aria-hidden','true');
+  ov.innerHTML='<div class="burst-sheet"></div><div class="burst-crown"></div><div class="burst-ring r1"></div><div class="burst-ring r2"></div><div class="login-character" role="img">'+character+'</div>';
   document.body.appendChild(ov);
-  if(reduce){ov.classList.add('reduce','arrive','flood','settled');setTimeout(()=>ov.classList.add('leaving'),1000);setTimeout(()=>ov.remove(),1550);return;}
+  if(reduce){ov.classList.add('reduce','arrive','impact');setTimeout(()=>ov.classList.add('leaving'),900);setTimeout(()=>ov.remove(),1450);return;}
   requestAnimationFrame(()=>ov.classList.add('arrive'));
-  setTimeout(()=>{ov.classList.add('impact','flood');sound(type==='elephant'?'impact':'splash');if(type==='elephant'&&navigator.vibrate)navigator.vibrate([110,45,160,55,240]);
-    for(let i=0;i<(type==='elephant'?24:16);i++){const b=document.createElement('i'),size=8+Math.random()*(type==='elephant'?30:20);b.className='login-bubble';b.style.cssText='left:'+(Math.random()*100)+'%;width:'+size+'px;height:'+size+'px;animation-delay:'+(Math.random()*.45)+'s;animation-duration:'+(1.55+Math.random()*.9)+'s';ov.appendChild(b);setTimeout(()=>b.remove(),2900);}},560);
-  setTimeout(()=>ov.classList.add('settled'),1280);
-  setTimeout(()=>ov.classList.add('leaving'),3150);
-  setTimeout(()=>ov.remove(),3750);
+  setTimeout(()=>{
+    const jets=type==='elephant'?32:24,reach=Math.hypot(innerWidth,innerHeight)*(type==='elephant'?.62:.55);
+    for(let i=0;i<jets;i++){
+      const jet=document.createElement('i'),angle=(Math.PI*2*i/jets)+(Math.random()-.5)*.16,distance=reach*(.72+Math.random()*.38),size=(type==='elephant'?13:10)+Math.random()*(type==='elephant'?22:17);
+      jet.className='burst-jet';jet.style.cssText='--dx:'+(Math.cos(angle)*distance)+'px;--dy:'+(Math.sin(angle)*distance)+'px;--rot:'+(angle*180/Math.PI+90)+'deg;--size:'+size+'px;--delay:'+(Math.random()*90)+'ms;--duration:'+(type==='elephant'?620+Math.random()*220:720+Math.random()*260)+'ms;';ov.appendChild(jet);
+    }
+    ov.classList.add('impact');sound(type==='elephant'?'impact':'splash');if(type==='elephant'&&navigator.vibrate)navigator.vibrate([110,45,160,55,240]);
+  },520);
+  setTimeout(()=>ov.classList.add('leaving'),2850);
+  setTimeout(()=>ov.remove(),3420);
 }
 function bigSplash(parent,opts){
   parent=parent||document.body;opts=opts||{};const cx=innerWidth/2,cy=innerHeight*(opts.intro?.5:.46),density=opts.intro?26:34;
