@@ -2,30 +2,30 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Pelooty</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8D%91%3C/text%3E%3C/svg%3E" />
 <style>
   :root{
-    --bg:#100B10; --bg2:#1B1218;
-    --card:#1D151B; --card2:#271C23; --line:#332631; --line2:#42303D;
-    --ink:#F8F3F0; --muted:#A493A0;
-    --accent:#FF8A5C; --accent2:#FF6D7F; --accent-dim:#4E3230; --accent-soft:rgba(255,138,92,.14);
-    --done:#6FD9A0; --done-dim:#24463A;
-    --blue:#8FB8E8;
+    --bg:#0B0F14; --bg2:#111720;
+    --card:#151C26; --card2:#1B2431; --line:#293647; --line2:#3A4A60;
+    --ink:#F6F8FB; --muted:#9BA8B8;
+    --accent:#72D5FF; --accent2:#8B9CFF; --accent-dim:#20384A; --accent-soft:rgba(114,213,255,.14);
+    --done:#63E6BE; --done-dim:#173E37;
+    --blue:#8FB8FF;
     --r:20px; --r-sm:13px; --pad:18px;
     --grad:linear-gradient(135deg,var(--accent),var(--accent2));
-    --shadow:0 10px 30px rgba(0,0,0,.35);
+    --shadow:0 14px 38px rgba(0,0,0,.32);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html{scroll-behavior:smooth}
   html,body{background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display','Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     font-feature-settings:"tnum" 1}
-  body{max-width:540px;margin:0 auto;min-height:100vh;padding-bottom:calc(44px + env(safe-area-inset-bottom));overflow-x:hidden;
+  body{max-width:760px;margin:0 auto;min-height:100vh;padding-bottom:calc(44px + env(safe-area-inset-bottom));overflow-x:hidden;
     background:
-      radial-gradient(110% 46% at 50% -6%, #2E1A22 0%, transparent 60%),
-      radial-gradient(90% 40% at 50% 108%, #1E1420 0%, transparent 55%),
+      radial-gradient(110% 46% at 50% -6%, #142236 0%, transparent 60%),
+      radial-gradient(90% 40% at 50% 108%, #111B2B 0%, transparent 55%),
       var(--bg);
     background-attachment:fixed}
   .num{font-variant-numeric:tabular-nums}
@@ -33,7 +33,9 @@
   input,textarea,select{font-family:inherit;color:inherit}
   input,textarea{font-size:16px}
   ::selection{background:var(--accent-soft)}
-  ::-webkit-scrollbar{width:0;height:0}
+  ::-webkit-scrollbar{width:8px;height:8px}
+  ::-webkit-scrollbar-thumb{background:var(--line2);border-radius:999px}
+  ::-webkit-scrollbar-track{background:transparent}
 
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(111,217,160,.55)}70%{box-shadow:0 0 0 7px rgba(111,217,160,0)}100%{box-shadow:0 0 0 0 rgba(111,217,160,0)}}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -41,27 +43,27 @@
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
   @keyframes floaty{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-3px) rotate(4deg)}}
   @keyframes shim{0%{background-position:-140px 0}100%{background-position:220px 0}}
-  @keyframes glowp{0%,100%{box-shadow:0 0 14px rgba(255,138,92,.45)}50%{box-shadow:0 0 26px rgba(255,138,92,.8)}}
+  @keyframes glowp{0%,100%{box-shadow:0 0 14px rgba(99,230,190,.38)}50%{box-shadow:0 0 26px rgba(99,230,190,.72)}}
   @keyframes popin{0%{transform:scale(.6);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
 
   /* ===== header ===== */
   .top{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:10px;
     padding:14px var(--pad) 10px;
-    background:rgba(16,11,16,.72);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);
+    background:rgba(11,15,20,.78);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3);
     border-bottom:1px solid rgba(255,255,255,.05)}
   .brand{display:flex;align-items:center;gap:9px}
   .brand .dot{width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:21px;
-    animation:floaty 4.5s ease-in-out infinite;filter:drop-shadow(0 3px 10px rgba(255,138,92,.35))}
+    animation:floaty 4.5s ease-in-out infinite;filter:drop-shadow(0 3px 10px rgba(114,213,255,.32))}
   .brand h1{font-size:15px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
     background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
-  .sbtn{width:34px;height:34px;border-radius:11px;background:var(--card);border:1px solid var(--line);
+  .sbtn{width:40px;height:40px;border-radius:13px;background:var(--card);border:1px solid var(--line);
     display:flex;align-items:center;justify-content:center;font-size:15px;transition:transform .12s}
   .sbtn:active{transform:scale(.9)}
   .live{display:flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
   .live .b{width:7px;height:7px;border-radius:50%;background:#5b4f58}
   .live.on .b{background:var(--done);animation:pulse 2s infinite}
   .wk{display:flex;align-items:center;gap:2px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px;box-shadow:var(--shadow)}
-  .wk button{width:30px;height:30px;border-radius:999px;color:var(--muted);font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;transition:all .12s}
+  .wk button{width:38px;height:38px;border-radius:999px;color:var(--muted);font-size:17px;font-weight:600;display:flex;align-items:center;justify-content:center;transition:all .12s}
   .wk button:active{background:var(--card2);color:var(--accent);transform:scale(.9)}
   .wk .lab{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--muted);padding:0 7px;min-width:62px;text-align:center}
   .wk .lab b{color:var(--ink)}
@@ -88,7 +90,16 @@
   .eyebrow .who button{color:var(--accent);font-weight:700;flex:0 0 auto}
 
   /* ===== day cards ===== */
+  .weekhero{position:relative;overflow:hidden;background:linear-gradient(145deg,#172334,#121923);border:1px solid #2A3C52;border-radius:24px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .weekhero:after{content:"";position:absolute;width:180px;height:180px;border-radius:50%;right:-70px;top:-105px;background:radial-gradient(circle,rgba(114,213,255,.22),transparent 68%);pointer-events:none}
+  .wktopline{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;position:relative;z-index:1}
+  .wkcopy{font-size:12px;color:var(--muted);line-height:1.5}
+  .wkcopy b{display:block;color:var(--ink);font-size:18px;letter-spacing:-.02em}
+  .wkpct{font-size:34px;font-weight:850;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .wkprogress{height:8px;background:var(--bg);border-radius:999px;overflow:hidden;margin-top:16px;border:1px solid var(--line)}
+  .wkprogress span{display:block;height:100%;width:0;background:var(--grad);border-radius:inherit;transition:width .45s cubic-bezier(.2,.8,.3,1)}
   .days{display:flex;flex-direction:column;gap:11px}
+  @media (min-width:700px){.days{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.screen{padding-left:24px;padding-right:24px}.top{padding-left:24px;padding-right:24px}}
   .day{display:flex;align-items:center;gap:14px;background:linear-gradient(180deg,var(--card2),var(--card));
     border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;text-align:left;width:100%;
     box-shadow:var(--shadow);transition:transform .14s cubic-bezier(.2,.8,.3,1),border-color .14s;animation:rise .5s cubic-bezier(.2,.8,.3,1) backwards}
@@ -118,6 +129,7 @@
   .shead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:4px 0 16px}
   .shead h2{font-size:24px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
   .shead .date{font-size:12px;color:var(--muted);white-space:nowrap}
+  .smeta{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
   .ex{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:var(--r);
     margin-bottom:12px;overflow:hidden;box-shadow:var(--shadow);animation:rise .45s cubic-bezier(.2,.8,.3,1) backwards;transition:border-color .2s}
   .ex.open{border-color:var(--line2)}
@@ -178,7 +190,7 @@
   .addform .w{width:74px;flex:0 0 auto;text-align:center}
   .addform .acts{display:flex;gap:8px;justify-content:flex-end}
   .addform .acts button{padding:9px 18px;border-radius:11px;font-size:13px;font-weight:800}
-  .addform .save{background:var(--grad);color:#2A0F0A}
+  .addform .save{background:var(--grad);color:#071116}
   .addform .cancel{color:var(--muted)}
 
   /* ===== home extras / games ===== */
@@ -190,7 +202,7 @@
   .gcard .gtxt{flex:1;min-width:0}
   .gcard .gt{font-size:15px;font-weight:700;letter-spacing:-.01em}
   .gcard .gs{font-size:12px;color:var(--muted);margin-top:3px}
-  .cbadge{background:var(--grad);color:#2A0F0A;font-size:11px;font-weight:800;min-width:19px;height:19px;padding:0 6px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;animation:popin .3s ease}
+  .cbadge{background:var(--grad);color:#071116;font-size:11px;font-weight:800;min-width:19px;height:19px;padding:0 6px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;margin-right:8px;animation:popin .3s ease}
   .gbar{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 16px;margin-bottom:12px;font-size:13px;color:var(--muted)}
   .gbar b{color:var(--ink);font-size:18px;font-weight:800;margin-left:4px}
   .result{text-align:center;padding:26px 10px;animation:rise .4s ease}
@@ -206,12 +218,12 @@
   .racts{display:flex;gap:9px;justify-content:center;margin-top:18px}
   .racts button{padding:11px 22px;border-radius:13px;font-size:14px;font-weight:800;transition:transform .12s}
   .racts button:active{transform:scale(.94)}
-  .racts .save{background:var(--grad);color:#2A0F0A;box-shadow:0 6px 18px rgba(255,120,100,.3)}
+  .racts .save{background:var(--grad);color:#071116;box-shadow:0 6px 18px rgba(114,213,255,.24)}
   .racts .cancel{color:var(--muted)}
   .rxn{width:100%;height:46vh;border-radius:var(--r);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;transition:background .12s,transform .12s;box-shadow:var(--shadow)}
   .rxn:active{transform:scale(.99)}
   .rxn.wait{background:var(--card2);color:var(--muted)}
-  .rxn.go{background:var(--grad);color:#2A0F0A}
+  .rxn.go{background:var(--grad);color:#071116}
   .rxn.early{background:#4E3230;color:#FFB59B}
   .rxn.done{background:var(--done-dim);color:#BFEFD4}
   #rxn-lb{margin-top:16px}
@@ -237,13 +249,13 @@
   .kbar{height:7px;background:var(--card);border-radius:5px;overflow:hidden;margin:6px 0 8px;border:1px solid var(--line)}
   .kbarfill{height:100%;width:0;background:var(--grad);background-size:220px 100%;animation:shim 2.4s linear infinite;transition:width .5s linear}
   .korbwrap{position:relative;height:250px;display:flex;align-items:center;justify-content:center}
-  .korb{width:126px;height:126px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#2A0F0A;font-weight:800;font-size:14px;letter-spacing:.06em;box-shadow:0 0 60px rgba(255,130,95,.45)}
+  .korb{width:126px;height:126px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:#071116;font-weight:800;font-size:14px;letter-spacing:.06em;box-shadow:0 0 60px var(--game-glow,rgba(114,213,255,.3))}
   .kphase{text-align:center;font-size:21px;font-weight:800;min-height:27px;margin-top:4px;letter-spacing:-.01em}
   .kcount{text-align:center;font-size:44px;font-weight:800;color:var(--muted);min-height:52px}
   .kbreathe{text-align:center;font-size:11px;color:var(--muted);margin:4px 0 6px;letter-spacing:.05em}
   .ktag{text-align:center;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
   .kcritter{position:absolute;top:-4px;left:50%;transform:translateX(-50%);display:none;flex-direction:column;align-items:center;z-index:6;pointer-events:none}
-  .kcritter .bub{background:var(--ink);color:#2A0F0A;font-size:12px;font-weight:800;padding:7px 13px;border-radius:14px;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.5);position:relative}
+  .kcritter .bub{background:var(--ink);color:#071116;font-size:12px;font-weight:800;padding:7px 13px;border-radius:14px;white-space:nowrap;box-shadow:0 8px 22px rgba(0,0,0,.5);position:relative}
   .kcritter .bub:after{content:'';position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--ink);border-bottom:0}
   .kcritter .crit{font-size:33px;margin-top:2px;animation:bob 1.4s ease-in-out infinite}
   .kbcard{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:12px 14px;margin-bottom:8px;text-align:left}
@@ -261,14 +273,14 @@
   .msg.them{align-self:flex-start}
   .msg .mw{font-size:10px;color:var(--muted);margin-left:8px}
   .msg .mb{padding:10px 14px;border-radius:18px;font-size:14px;line-height:1.45;word-break:break-word;box-shadow:0 3px 10px rgba(0,0,0,.22)}
-  .msg.me .mb{background:var(--grad);color:#2A0F0A;border-bottom-right-radius:6px}
+  .msg.me .mb{background:var(--grad);color:#071116;border-bottom-right-radius:6px}
   .msg.them .mb{background:var(--card2);border:1px solid var(--line);border-bottom-left-radius:6px}
   .msg .mt{font-size:9px;color:var(--muted);margin:2px 8px 0}
   .msg.me .mt{align-self:flex-end}
   .chatbar{display:flex;gap:9px;margin-top:12px}
   .chatbar input{flex:1;background:var(--card);border:1px solid var(--line);border-radius:15px;padding:12px 15px;font-size:16px;transition:border-color .15s}
   .chatbar input:focus{outline:none;border-color:var(--accent)}
-  .chatbar button{width:48px;height:48px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:18px;padding:0;border-radius:50%;background:var(--grad);color:#2A0F0A;box-shadow:0 6px 16px rgba(255,120,100,.3);transition:transform .12s}
+  .chatbar button{width:48px;height:48px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:18px;padding:0;border-radius:50%;background:var(--grad);color:#071116;box-shadow:0 6px 16px rgba(114,213,255,.24);transition:transform .12s}
   .chatbar button:active{transform:scale(.88)}
 
   /* ===== calendar ===== */
@@ -281,11 +293,11 @@
   .cdow{font-size:10px;color:var(--muted);text-align:center;padding:4px 0;font-weight:700;letter-spacing:.04em}
   .cday{aspect-ratio:1;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--ink);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;transition:transform .1s,background .15s}
   .cday:active{transform:scale(.9)}
-  .cday.on{background:var(--grad);color:#2A0F0A;border-color:transparent;box-shadow:0 4px 14px rgba(255,120,100,.3)}
+  .cday.on{background:var(--grad);color:#071116;border-color:transparent;box-shadow:0 4px 14px rgba(114,213,255,.24)}
   .cday.today{outline:2px solid var(--accent);outline-offset:-2px}
   .cdn{font-size:13px;line-height:1}
   .ctag{font-size:8px;font-weight:800;letter-spacing:.02em;line-height:1;background:rgba(0,0,0,.2);padding:1px 4px;border-radius:5px;margin-top:1px;font-style:normal}
-  .cday.on .ctag{background:rgba(0,0,0,.24);color:#2A0F0A}
+  .cday.on .ctag{background:rgba(0,0,0,.24);color:#071116}
   .calhint{text-align:center;font-size:11px;color:var(--muted);margin-top:14px}
   .histwrap{margin-top:22px}
   .histuser{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:9px}
@@ -299,6 +311,30 @@
   .pickopt:active{border-color:var(--accent);transform:scale(.985)}
   .pickopt.clr{color:var(--muted)}
   .pickopt.cancel{text-align:center;color:var(--muted);background:none;border:none;margin-top:4px}
+
+  /* ===== game themes ===== */
+  .game-theme{--game-glow:rgba(114,213,255,.22)}
+  .theme-kegel{--accent:#E88BC4;--accent2:#A78BFA;--accent-soft:rgba(232,139,196,.15);--accent-dim:#4A2A43;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(232,139,196,.24)}
+  .theme-hold{--accent:#F6C768;--accent2:#F59E0B;--accent-soft:rgba(246,199,104,.15);--accent-dim:#493719;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(246,199,104,.24)}
+  .theme-random{--accent:#FF8A65;--accent2:#FB7185;--accent-soft:rgba(255,138,101,.15);--accent-dim:#4C2B29;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(255,138,101,.24)}
+  .theme-ttt{--accent:#F0B45B;--accent2:#79AFFF;--accent-soft:rgba(240,180,91,.15);--accent-dim:#44351F;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(121,175,255,.24)}
+  .theme-reaction{--accent:#E8F56A;--accent2:#76E6C2;--accent-soft:rgba(232,245,106,.14);--accent-dim:#38421E;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(232,245,106,.22)}
+  .gcard.game-theme{border-color:var(--accent-dim)}
+  .gcard.game-theme .gico{background:var(--accent-soft);box-shadow:0 0 24px var(--game-glow)}
+  .gcard.game-theme:active{border-color:var(--accent)}
+  .game-theme .shead h2{color:var(--accent)}
+  .game-theme .racts .save{box-shadow:0 8px 24px var(--game-glow)}
+  .game-theme .result .rscore{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tttlegend{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:4px 0 10px}
+  .tttrole{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+  .tttrole.me{border-color:var(--accent);color:var(--ink)}
+  .tttrole .animal{font-size:18px}
+  .tcell.hamster{background:linear-gradient(180deg,#3B3020,#241E17);border-color:#6A512C}
+  .tcell.elephant{background:linear-gradient(180deg,#21334D,#182332);border-color:#34547A}
+  .tcell:disabled{cursor:default}
+  .syncstate{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .syncstate.saving{color:var(--accent)}
+  .syncstate.error{color:#FF8A8A}
 
   /* ===== auth / misc ===== */
   .center{min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px}
@@ -316,10 +352,12 @@
 
   /* ===== intro / fx ===== */
   #intro{position:fixed;inset:0;z-index:10000;display:flex;align-items:center;justify-content:center;
-    background:radial-gradient(120% 120% at 50% 45%,#2B181F 0%,var(--bg) 72%);pointer-events:none}
-  #intro .peach{font-size:126px;will-change:transform,opacity;filter:drop-shadow(0 10px 36px rgba(255,130,95,.45))}
+    background:radial-gradient(120% 120% at 50% 45%,#132033 0%,var(--bg) 72%);pointer-events:none}
+  #intro .peach{font-size:126px;will-change:transform,opacity;filter:drop-shadow(0 10px 36px rgba(114,213,255,.36))}
   #fx{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
   .fxbit{position:fixed;will-change:transform,opacity}
+  button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+  @media (max-width:390px){.live span:last-child{display:none}.top{gap:6px}.brand h1{font-size:13px}.wk .lab{min-width:52px;padding:0 4px}}
 </style>
 </head>
 <body>
@@ -343,9 +381,9 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-app.js';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, addDoc, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, onSnapshot, collection, addDoc, query, orderBy, limitToLast, where, runTransaction } from 'https://www.gstatic.com/firebasejs/12.15.0/firebase-firestore.js';
 
-function showFatal(msg){ try{ const a=document.getElementById('app'); if(a)a.innerHTML='<div style="padding:24px;color:#FF8567;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.5">App error \u2014 send this to fix it:\n\n'+String(msg)+'</div>'; }catch(_){ } }
+function showFatal(msg){ try{ const a=document.getElementById('app'); if(a){const box=document.createElement('div');box.style.cssText='padding:24px;color:#FF8A8A;font-size:12px;font-family:monospace;white-space:pre-wrap;line-height:1.5';box.textContent='App error \u2014 send this to fix it:\n\n'+String(msg);a.replaceChildren(box);} }catch(_){ } }
 window.addEventListener('error',e=>showFatal((e&&e.message)||(e&&e.error)||'error'));
 window.addEventListener('unhandledrejection',e=>showFatal((e&&e.reason&&e.reason.message)||(e&&e.reason)||'promise rejection'));
 
@@ -412,7 +450,15 @@ const db=getFirestore(fbApp);
 const provider=new GoogleAuthProvider();
 
 let WEEK=20, view={screen:"home",dayId:null}, state={}, subs=[], renderedIds="", tttLastWin='';
+let accountDisposers=[],accountTimers=[];
 function clearSubs(){subs.forEach(u=>{try{u()}catch(e){}});subs=[];}
+function accountInterval(fn,ms){const id=setInterval(fn,ms);accountTimers.push(id);return id;}
+function clearAccountServices(){
+  accountDisposers.forEach(fn=>{try{fn()}catch(e){}});accountDisposers=[];
+  accountTimers.forEach(clearInterval);accountTimers=[];
+  presenceStarted=false;presenceData={};presenceErr='';chatWatchStarted=false;allChat=[];lastReadChat=0;unreadChat=0;chatMaxSeen=0;chatRenderedIds=[];splashWatchStarted=false;splashSeenT=0;splashCounts={};
+  const p=document.getElementById('presbar');if(p){p.innerHTML='';p.style.display='none';}
+}
 function liveOn(ok){const el=document.getElementById('live');el.classList.toggle('on',ok);document.getElementById('liveLbl').textContent=ok?'live':'offline';}
 function key(wk,id){return 'w'+wk+'-d'+id}
 function dref(wk,id){return doc(db,'sessions',key(wk,id))}
@@ -420,7 +466,8 @@ function seedFromProgram(day){return {exercises:day.ex.map(e=>({id:uid(),name:e.
 function carry(prev){return {exercises:(prev.exercises||[]).map(e=>({id:uid(),name:e.name,ts:e.ts,tr:e.tr,load:e.load,unit:e.unit||"reps",sets:Array(e.ts).fill(0),cnote:"",anote:""}))};}
 function shape(day,d){d=d||{};if(!Array.isArray(d.exercises))d.exercises=seedFromProgram(day).exercises;d.exercises.forEach(e=>{if(!Array.isArray(e.sets))e.sets=Array(e.ts||1).fill(0);if(e.cnote==null)e.cnote="";if(e.anote==null)e.anote="";if(!e.unit)e.unit="reps";});return d;}
 let saveT={};
-function save(wk,id){const k=key(wk,id);clearTimeout(saveT[k]);saveT[k]=setTimeout(()=>{setDoc(dref(wk,id),state[k],{merge:true}).catch(e=>console.warn(e));},300);}
+function setSyncStatus(kind,label){const el=document.getElementById('syncstate');if(el){el.className='syncstate '+(kind||'');el.textContent=label;}}
+function save(wk,id){const k=key(wk,id);clearTimeout(saveT[k]);setSyncStatus('saving','Saving\u2026');saveT[k]=setTimeout(()=>{setDoc(dref(wk,id),state[k],{merge:true}).then(()=>setSyncStatus('','Synced')).catch(e=>{setSyncStatus('error','Sync failed');console.warn(e);});},300);}
 const vol=e=>(e.sets||[]).reduce((a,b)=>a+(+b||0),0);
 const tgt=e=>(e.ts||0)*(e.tr||0);
 const hit=e=>(e.sets||[]).length>=e.ts && (e.sets||[]).slice(0,e.ts).every(v=>v>=e.tr);
@@ -443,7 +490,7 @@ async function ensureDay(wk,id){
 function renderHome(){
   view={screen:"home",dayId:null};clearSubs();clearGameTimers();
   const email=auth.currentUser?auth.currentUser.email:"";
-  let h='<div class="screen"><div class="eyebrow"><span>Week '+WEEK+' &middot; pick a day</span><span class="who"><span class="whoe">'+esc(email)+'</span><button id="signout">Sign out</button></span></div><div class="days">';
+  let h='<div class="screen"><div class="eyebrow"><span>Week '+WEEK+' &middot; pick a day</span><span class="who"><span class="whoe">'+esc(email)+'</span><button id="signout">Sign out</button></span></div><div class="weekhero"><div class="wktopline"><div class="wkcopy"><b>Weekly progress</b><span id="wkdone">0 of '+PROGRAM.length+' sessions complete</span></div><div class="wkpct num" id="wkpct">0%</div></div><div class="wkprogress" role="progressbar" aria-label="Weekly progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="wkfill"></span></div></div><div class="days">';
   PROGRAM.forEach((day,idx)=>{
     const t=day.type==="hyp"?"t-hyp":day.type==="neu"?"t-neu":"t-rest";
     const pill=day.type==="hyp"?'<span class="pill hyp">Hypertrophy</span>':day.type==="neu"?'<span class="pill neu">Neural</span>':'<span class="pill rest">Rest</span>';
@@ -459,10 +506,15 @@ function renderHome(){
         const dc=document.getElementById('dc-'+day.id);if(dc)dc.textContent=doneCount(d)+"/"+d.exercises.length;
         const ec=document.getElementById('ec-'+day.id);if(ec)ec.textContent=d.exercises.length+" exercises";
         const rg=document.getElementById('ring-'+day.id);if(rg){const pct=Math.round(doneCount(d)/Math.max(1,d.exercises.length)*100);rg.style.setProperty('--pct',pct);rg.classList.toggle('full',pct>=100);}}
-      else{const dc=document.getElementById('dc-'+day.id);if(dc)dc.textContent="0/"+day.ex.length;}
+      else{const dc=document.getElementById('dc-'+day.id);if(dc)dc.textContent="0/"+day.ex.length;}updateWeekSummary();
     },err=>{liveOn(false);handleErr(err);});
     subs.push(u);
   });
+}
+function updateWeekSummary(){
+  let sessions=0,done=0,total=0;PROGRAM.forEach(day=>{const d=state[key(WEEK,day.id)],count=d?doneCount(d):0,len=d?(d.exercises||[]).length:day.ex.length;if(len&&count>=len)sessions++;done+=count;total+=len;});
+  const pct=Math.round(done/Math.max(1,total)*100),label=document.getElementById('wkdone'),num=document.getElementById('wkpct'),fill=document.getElementById('wkfill'),bar=document.querySelector('.wkprogress');
+  if(label)label.textContent=sessions+' of '+PROGRAM.length+' sessions complete';if(num)num.textContent=pct+'%';if(fill)fill.style.width=pct+'%';if(bar)bar.setAttribute('aria-valuenow',String(pct));
 }
 
 async function openDay(id){
@@ -480,10 +532,10 @@ async function openDay(id){
 
 function renderSession(day){
   const d=state[key(WEEK,day.id)];
-  let h='<div class="screen"><button class="back" id="back">&lsaquo; Week '+WEEK+'</button><div class="shead"><h2>'+esc(day.name)+'</h2><div class="date">Week '+WEEK+' &middot; Day '+day.id+'</div></div>';
+  let h='<div class="screen"><button class="back" id="back">&lsaquo; Week '+WEEK+'</button><div class="shead"><h2>'+esc(day.name)+'</h2><div class="smeta"><div class="date">Week '+WEEK+' &middot; Day '+day.id+'</div><div class="syncstate" id="syncstate" role="status" aria-live="polite">Synced</div></div></div>';
   d.exercises.forEach((e,i)=>{
     const v=vol(e),t=tgt(e),hi=hit(e);
-    h+='<div class="ex" data-i="'+i+'" style="animation-delay:'+(i*0.04)+'s"><button class="row toggle">'+
+    h+='<div class="ex" data-i="'+i+'" style="animation-delay:'+(i*0.04)+'s"><button class="row toggle" aria-expanded="false">'+
       '<div class="nm"><div class="t" id="t-'+i+'">'+esc(e.name)+'</div><div class="tg" id="tg-'+i+'">target '+e.ts+' \u00D7 '+e.tr+' &middot; '+esc(e.load||'')+'</div></div>'+
       '<span class="badge '+(hi?'hit':'')+'" id="bd-'+i+'">'+(hi?'100%':v+'/'+t)+'</span><span class="chev2">&rsaquo;</span></button>'+
       '<div class="panel">'+
@@ -510,7 +562,7 @@ function renderSession(day){
   d.exercises.forEach((e,i)=>{
     drawSets(day,i);
     const card=app.querySelector('.ex[data-i="'+i+'"]');
-    card.querySelector('.toggle').onclick=ev=>{if(ev.target.closest('input'))return;card.classList.toggle('open');};
+    card.querySelector('.toggle').onclick=ev=>{if(ev.target.closest('input'))return;const open=card.classList.toggle('open');card.querySelector('.toggle').setAttribute('aria-expanded',String(open));};
     bindInput('en-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.name=val;const t=document.getElementById('t-'+i);if(t)t.textContent=val;},day);
     bindInput('ld-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.load=val;patchEx(day,i);},day);
     bindNum('es-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.ts=Math.max(1,val);patchEx(day,i);},day);
@@ -565,11 +617,11 @@ function drawSets(day,i){
   const d=state[key(WEEK,day.id)],e=d.exercises[i],wrap=document.getElementById('st-'+i);
   if(!wrap||!e)return;const st=stepOf(e);let h='';
   (e.sets||[]).forEach((v,si)=>{const ok=v>=e.tr;
-    h+='<div class="set"><span class="sx">'+(si+1)+'</span><button data-a="dec" data-s="'+si+'">&minus;</button>'+
+    h+='<div class="set"><span class="sx">'+(si+1)+'</span><button data-a="dec" data-s="'+si+'" aria-label="Decrease set '+(si+1)+'">&minus;</button>'+
        '<input class="vIn num '+(ok?'ok':'')+'" type="number" inputmode="numeric" min="0" data-s="'+si+'" value="'+v+'"/>'+
-       '<button data-a="inc" data-s="'+si+'">+</button>'+((e.sets.length>e.ts)?'<button class="rm" data-a="rm" data-s="'+si+'">\u2715</button>':'')+
+       '<button data-a="inc" data-s="'+si+'" aria-label="Increase set '+(si+1)+'">+</button>'+((e.sets.length>e.ts)?'<button class="rm" data-a="rm" data-s="'+si+'" aria-label="Remove set '+(si+1)+'">\u2715</button>':'')+
        (isSec(e)?'<span class="su">s</span>':'')+'</div>';});
-  h+='<button class="addset" data-a="add">+ set</button>';wrap.innerHTML=h;
+  h+='<button class="addset" data-a="add" aria-label="Add a set">+ set</button>';wrap.innerHTML=h;
   wrap.querySelectorAll('.vIn').forEach(inp=>{
     inp.oninput=()=>{const ex=curEx(day,i)||e,si=+inp.dataset.s,arr=ex.sets,was=hit(ex);
       let val=parseInt(inp.value);if(isNaN(val))val=0;val=Math.max(0,val);arr[si]=val;
@@ -617,20 +669,20 @@ function introSplash(){
     {transform:'scale(1) rotate(-5deg)',opacity:1,offset:.76},
     {transform:'scale(1.05) rotate(4deg)',opacity:1,offset:.88},
     {transform:'scale(1.3) rotate(0deg)',opacity:1,offset:1}
-  ],{duration:2600,easing:'cubic-bezier(.3,.7,.3,1)',fill:'forwards'});
+  ],{duration:1600,easing:'cubic-bezier(.3,.7,.3,1)',fill:'forwards'});
   setTimeout(()=>{
     // PUNCH — pops, does not fade
     p.animate([{transform:'scale(1.3)'},{transform:'scale(2.15)'},{transform:'scale(1.5)'}],{duration:300,easing:'cubic-bezier(.2,1.5,.3,1)',fill:'forwards'});
     bigSplash(ov); sound('splash');
     if(navigator.vibrate)navigator.vibrate(emo===EMOJIS[1]?[70,50,90,50,130]:60);
     if(emo===EMOJIS[1])screenShake();
-  },2600);
-  setTimeout(()=>{ ov.remove(); },4150);
+  },1600);
+  setTimeout(()=>{ ov.remove(); },2850);
 }
 function bigSplash(parent){
   parent=parent||document.body;
   const cx=innerWidth/2, cy=innerHeight*0.46;
-  for(let r=0;r<3;r++){
+  for(let r=0;r<2;r++){
     const ring=document.createElement('div'); ring.className='fxbit';
     ring.style.cssText='left:'+cx+'px;top:'+cy+'px;width:20px;height:20px;margin:-10px 0 0 -10px;border-radius:50%;background:radial-gradient(circle,rgba(150,210,255,'+(.5-r*.12)+'),rgba(120,180,230,0) 70%)';
     parent.appendChild(ring); const sc=16+r*8;
@@ -638,7 +690,7 @@ function bigSplash(parent){
     setTimeout(()=>ring.remove(),1000+r*220);
   }
   const maxd=Math.hypot(innerWidth,innerHeight)*0.72;
-  for(let i=0;i<90;i++){
+  for(let i=0;i<36;i++){
     const wet=Math.random()<0.22; const d=document.createElement('div'); d.className='fxbit'; const sz=8+Math.random()*28;
     if(wet){d.textContent='\uD83D\uDCA6';d.style.fontSize=(14+Math.random()*24)+'px';}
     else{d.style.cssText='width:'+sz+'px;height:'+sz+'px;border-radius:50% 50% 58% 58%;background:radial-gradient(circle at 35% 28%,rgba(198,234,255,.97),rgba(110,170,225,.42));box-shadow:0 0 10px rgba(150,205,255,.4)';}
@@ -647,7 +699,7 @@ function bigSplash(parent){
     d.animate([{transform:'translate(0,0) scale(.3)',opacity:1},{transform:'translate('+(dx*.65)+'px,'+(dy*.65)+'px) scale(1)',opacity:1,offset:.4},{transform:'translate('+dx+'px,'+(dy+240)+'px) scale(.9) scaleY(2.3)',opacity:0}],{duration:1100+Math.random()*750,easing:'cubic-bezier(.2,.6,.4,1)',fill:'forwards'});
     setTimeout(()=>d.remove(),1950);
   }
-  for(let i=0;i<55;i++){
+  for(let i=0;i<20;i++){
     const x=Math.random()*innerWidth, y=Math.random()*innerHeight, sz=10+Math.random()*34;
     const s2=document.createElement('div'); s2.className='fxbit';
     s2.style.cssText='left:'+x+'px;top:'+y+'px;width:'+sz+'px;height:'+sz+'px;border-radius:48% 52% 55% 45%;background:radial-gradient(circle at 38% 30%,rgba(202,236,255,.92),rgba(120,175,225,.32));box-shadow:0 0 9px rgba(150,205,255,.4)';
@@ -668,13 +720,12 @@ function clearGameTimers(){gameTimers.forEach(t=>{clearTimeout(t);clearInterval(
 const sanit=e=>(e||'').replace(/[^a-z0-9]/gi,'_');
 async function saveBest(game,score,lower,extra){
   try{
-    const ref=doc(db,'games',game); const snap=await getDoc(ref);
-    const data=snap.exists()?snap.data():{bests:{}};
-    if(!data.bests)data.bests={};
-    const me=auth.currentUser?auth.currentUser.email:'me'; const k=sanit(me);
-    const cur=data.bests[k]?data.bests[k].score:(lower?Infinity:-Infinity);
-    if((lower&&score<cur)||(!lower&&score>cur)){ data.bests[k]=Object.assign({name:me,score:score},extra||{}); await setDoc(ref,data,{merge:true}); }
-    return data.bests;
+    const ref=doc(db,'games',game);const me=auth.currentUser?auth.currentUser.email:'me';const k=sanit(me);let result={};
+    await runTransaction(db,async tx=>{const snap=await tx.get(ref);const data=snap.exists()?(snap.data()||{}):{};const bests=Object.assign({},data.bests||{});
+      const cur=bests[k]?bests[k].score:(lower?Infinity:-Infinity);
+      if((lower&&score<cur)||(!lower&&score>cur))bests[k]=Object.assign({name:me,score:score},extra||{});
+      tx.set(ref,{bests:bests},{merge:true});result=bests;});
+    return result;
   }catch(e){return null;}
 }
 async function getBests(game){try{const snap=await getDoc(doc(db,'games',game));return snap.exists()?(snap.data().bests||{}):{};}catch(e){return {};}}
@@ -686,17 +737,12 @@ function bestsHTML(bests,lower,unit,fmt){
 
 async function recordAttempt(game,score,lower,extra){
   const me=auth.currentUser?auth.currentUser.email:'me'; const k=sanit(me);
-  let data={bests:{},history:{}};
-  try{const snap=await getDoc(doc(db,'games',game)); if(snap.exists())data=snap.data()||data;}catch(e){}
-  if(!data.bests)data.bests={}; if(!data.history)data.history={};
-  const entry=Object.assign({s:score,t:Date.now()},extra||{});
-  const myHist=((data.history[k]||[]).concat([entry])).slice(-12);
-  data.history[k]=myHist;
-  const upd={history:{}}; upd.history[k]=myHist;
-  const cur=data.bests[k]?data.bests[k].score:(lower?Infinity:-Infinity);
-  if((lower&&score<cur)||(!lower&&score>cur)){ data.bests[k]=Object.assign({name:me,score:score},extra||{}); upd.bests={}; upd.bests[k]=data.bests[k]; }
-  try{ await setDoc(doc(db,'games',game),upd,{merge:true}); }catch(e){console.warn(e);}
-  return data;
+  let result={bests:{},history:{}};const ref=doc(db,'games',game);const entry=Object.assign({s:score,t:Date.now()},extra||{});
+  try{await runTransaction(db,async tx=>{const snap=await tx.get(ref);const data=snap.exists()?(snap.data()||{}):{};const bests=Object.assign({},data.bests||{}),history=Object.assign({},data.history||{});
+      history[k]=((history[k]||[]).concat([entry])).slice(-12);const cur=bests[k]?bests[k].score:(lower?Infinity:-Infinity);
+      if((lower&&score<cur)||(!lower&&score>cur))bests[k]=Object.assign({name:me,score:score},extra||{});
+      result={bests:bests,history:history};tx.set(ref,result,{merge:true});});}catch(e){console.warn(e);}
+  return result;
 }
 function holdHistHTML(data){
   const hist=data.history||{}, bests=data.bests||{};
@@ -726,10 +772,10 @@ function renderGames(){
     '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
     '<p class="kintro" id="splashTally"></p>'+
     kegelCard()+
-    '<button class="gcard play" id="g-hold"><div class="gico">\u23F1\uFE0F</div><div class="gtxt"><div class="gt">Steady Hold</div><div class="gs">Release at exactly 10s \u2014 by feel</div></div><div class="chev">\u203a</div></button>'+
-    '<button class="gcard play" id="g-rhold"><div class="gico">\uD83C\uDFB2</div><div class="gtxt"><div class="gt">Random Hold</div><div class="gs">3\u201310s \u00b7 new target every try</div></div><div class="chev">\u203a</div></button>'+
-    '<button class="gcard play" id="g-ttt"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Tic-Tac-Toe</div><div class="gs">Live</div></div><div class="chev">\u203a</div></button>'+
-    '<button class="gcard play" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it changes</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play game-theme theme-hold" id="g-hold"><div class="gico">\u23F1\uFE0F</div><div class="gtxt"><div class="gt">Steady Hold</div><div class="gs">Release at exactly 10s \u2014 by feel</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play game-theme theme-random" id="g-rhold"><div class="gico">\uD83C\uDFB2</div><div class="gtxt"><div class="gt">Random Hold</div><div class="gs">3\u201310s \u00b7 new target every try</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play game-theme theme-ttt" id="g-ttt"><div class="gico">\uD83D\uDC39</div><div class="gtxt"><div class="gt">Hamster vs Elephant</div><div class="gs">Live \u00b7 launcher plays first</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play game-theme theme-reaction" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it changes</div></div><div class="chev">\u203a</div></button>'+
     '</div>';
   document.getElementById('gback').onclick=renderHome;
   document.getElementById('g-keg').onclick=()=>renderKegel();
@@ -743,7 +789,7 @@ function renderGames(){
 function playReaction(){
   view={screen:"game",dayId:null}; clearGameTimers();
   let startT=0, ready=false, waiting=true;
-  app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Games</button>'+
+  app.innerHTML='<div class="screen game-theme theme-reaction"><button class="back" id="gback">\u2039 Games</button>'+
     '<div class="shead"><h2>Reaction \u26A1</h2></div>'+
     '<button class="rxn wait" id="rxn"><span id="rxn-l">Tap to start</span></button>'+
     '<div id="rxn-lb"></div></div>';
@@ -776,7 +822,7 @@ function fxLayer(){const l=document.getElementById('fx');return l;}
 function spawn(html,x,y){const s=document.createElement('div');s.className='fxbit';s.style.left=x+'px';s.style.top=y+'px';s.innerHTML=html;fxLayer().appendChild(s);return s;}
 function done(el,ms){setTimeout(()=>el.remove(),ms);}
 function fxConfetti(){
-  const cx=innerWidth/2, cy=innerHeight*0.4, cols=['#FF8567','#7BC99A','#FFD27B','#86B8E0','#F6EFE9','#E86A8C'];
+  const cx=innerWidth/2, cy=innerHeight*0.4, cols=['#72D5FF','#63E6BE','#E8F56A','#8B9CFF','#F6F8FB','#E88BC4'];
   for(let i=0;i<34;i++){
     const c=cols[i%cols.length];
     const s=spawn('<div style="width:8px;height:12px;border-radius:2px;background:'+c+'"></div>',cx,cy);
@@ -826,9 +872,9 @@ function homeExtras(){
 }
 
 /* ---- chat (collision-proof: one doc per message) ---- */
-let chatRendered=0;
+let chatRenderedIds=[];
 function renderChat(){
-  view={screen:"chat",dayId:null}; clearSubs(); clearGameTimers(); chatRendered=0;
+  view={screen:"chat",dayId:null}; clearSubs(); clearGameTimers(); chatRenderedIds=[];
   const me=auth.currentUser?auth.currentUser.email:'';
   app.innerHTML='<div class="screen"><button class="back" id="cback">\u2039 Home</button><div class="shead"><h2>Chat \uD83D\uDCAC</h2></div><div class="chatwrap" id="chatwrap"><div class="lb-empty" id="chatempty" style="text-align:center;margin-top:24px">Loading\u2026</div></div><div class="chatbar"><input id="chatin" placeholder="Message\u2026" autocomplete="off"/><button id="chatsend" aria-label="Send">\u27A4</button></div></div>';
   document.getElementById('cback').onclick=renderHome;
@@ -838,25 +884,26 @@ function renderChat(){
     sound('pop');addDoc(collection(db,'messages'),{e:me,txt:t,t:Date.now()}).catch(e=>console.warn(e));};
   document.getElementById('chatsend').onclick=send;
   document.getElementById('chatin').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
-  const qy=query(collection(db,'messages'),orderBy('t'),limit(400));
-  const u=onSnapshot(qy,snap=>{ liveOn(true); const msgs=[]; snap.forEach(dd=>msgs.push(dd.data())); appendChat(msgs,me); markChatRead(); },err=>{liveOn(false);handleErr(err);});
-  subs.push(u);
+  appendChat(allChat,me);markChatRead();
 }
 function appendChat(msgs,me){
   const w=document.getElementById('chatwrap'); if(!w)return;
-  const empty=document.getElementById('chatempty');
-  if(!msgs.length){ if(empty)empty.textContent='No messages yet \u2014 say hi.'; return; }
+  let empty=document.getElementById('chatempty');
+  if(!msgs.length){w.querySelectorAll('.msg').forEach(el=>el.remove());if(!empty){empty=document.createElement('div');empty.id='chatempty';empty.className='lb-empty';empty.style.cssText='text-align:center;margin-top:24px';w.appendChild(empty);}empty.textContent='No messages yet \u2014 say hi.';chatRenderedIds=[];return;}
   if(empty)empty.remove();
   const atBottom=w.scrollHeight-w.scrollTop-w.clientHeight<120;
-  for(let i=chatRendered;i<msgs.length;i++){
-    const m=msgs[i],mine=m.e===me,who=(m.e||'').split('@')[0];
+  const ids=msgs.map((m,i)=>m._id||((m.t||0)+'-'+(m.e||'')+'-'+i)),wanted=new Set(ids);
+  w.querySelectorAll('.msg').forEach(el=>{if(!wanted.has(el.dataset.id))el.remove();});
+  const existing=new Set(Array.from(w.querySelectorAll('.msg')).map(el=>el.dataset.id));
+  for(let i=0;i<msgs.length;i++){
+    const m=msgs[i],id=ids[i];if(existing.has(id))continue;const mine=m.e===me,who=(m.e||'').split('@')[0];
     const tm=new Date(m.t||Date.now()),hh=String(tm.getHours()).padStart(2,'0'),mm=String(tm.getMinutes()).padStart(2,'0');
-    const el=document.createElement('div'); el.className='msg '+(mine?'me':'them');
+    const el=document.createElement('div'); el.className='msg '+(mine?'me':'them');el.dataset.id=id;
     el.innerHTML=(mine?'':'<span class="mw">'+esc(who)+'</span>')+'<span class="mb">'+esc(m.txt)+'</span><span class="mt">'+hh+':'+mm+'</span>';
     w.appendChild(el);
     el.animate([{transform:(mine?'translateX(14px)':'translateX(-14px)')+' translateY(8px) scale(.95)',opacity:0},{transform:'none',opacity:1}],{duration:260,easing:'cubic-bezier(.2,.9,.3,1)'});
   }
-  chatRendered=msgs.length;
+  chatRenderedIds=ids;
   if(atBottom)w.scrollTop=w.scrollHeight+200;
 }
 
@@ -892,22 +939,23 @@ function openDayPicker(k){
   h+='<button class="pickopt clr" data-id="0">Clear / not trained</button><button class="pickopt cancel">Cancel</button></div>';
   ov.innerHTML=h; document.body.appendChild(ov);
   const close=()=>ov.remove(); ov.addEventListener('click',e=>{if(e.target===ov)close();});
-  ov.querySelectorAll('.pickopt').forEach(b=>b.onclick=()=>{ if(b.classList.contains('cancel')){close();return;} const id=+b.dataset.id;
-    if(id===0){delete calMarks[k];} else {calMarks[k]={done:true,dayId:id,day:b.dataset.n};}
-    setDoc(doc(db,'calendar','marks'),{days:calMarks},{merge:true}).catch(e=>console.warn(e)); close(); drawCal(); });
+  ov.querySelectorAll('.pickopt').forEach(b=>b.onclick=async()=>{ if(b.classList.contains('cancel')){close();return;} const id=+b.dataset.id,dayName=b.dataset.n||'';
+    if(id===0){delete calMarks[k];}else{calMarks[k]={done:true,dayId:id,day:dayName};}close();drawCal();
+    try{const ref=doc(db,'calendar','marks');await runTransaction(db,async tx=>{const snap=await tx.get(ref);const days=Object.assign({},snap.exists()?((snap.data()||{}).days||{}):{});
+        if(id===0)delete days[k];else days[k]={done:true,dayId:id,day:dayName};tx.set(ref,{days:days},{merge:true});});}catch(e){console.warn(e);} });
 }
 function drawCal(){
   const host=document.getElementById('calhost');if(!host)return;
   const y=calMonth.getFullYear(),m=calMonth.getMonth();
   const start=(new Date(y,m,1).getDay()+6)%7, days=new Date(y,m+1,0).getDate();
   const mn=calMonth.toLocaleString('de-DE',{month:'long',year:'numeric'});
-  let h='<div class="calhead"><button id="cprev">\u2039</button><div class="cm">'+mn+'</div><button id="cnext">\u203a</button></div>';
+  let h='<div class="calhead"><button id="cprev" aria-label="Previous month">\u2039</button><div class="cm">'+mn+'</div><button id="cnext" aria-label="Next month">\u203a</button></div>';
   h+='<div class="calstreak">\uD83D\uDD25 '+calcStreak()+' day streak</div><div class="calgrid">';
   ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(x=>h+='<div class="cdow">'+x+'</div>');
   for(let i=0;i<start;i++)h+='<div></div>';
   const today=ymd(new Date());
   for(let dd=1;dd<=days;dd++){const k=y+'-'+String(m+1).padStart(2,'0')+'-'+String(dd).padStart(2,'0');const mk=calMarks[k];const on=mk&&mk.done;
-    h+='<button class="cday'+(on?' on':'')+(k===today?' today':'')+'" data-d="'+k+'"><span class="cdn">'+dd+'</span>'+((on&&mk.dayId)?'<i class="ctag">D'+mk.dayId+'</i>':'')+'</button>';}
+    h+='<button class="cday'+(on?' on':'')+(k===today?' today':'')+'" data-d="'+k+'" aria-label="'+k+(on?' \u00b7 workout D'+mk.dayId:' \u00b7 no workout')+'"><span class="cdn">'+dd+'</span>'+((on&&mk.dayId)?'<i class="ctag">D'+mk.dayId+'</i>':'')+'</button>';}
   h+='</div><div class="calhint">Tap a day to log which workout you did.</div>';
   host.innerHTML=h;
   document.getElementById('cprev').onclick=()=>{calMonth=new Date(y,m-1,1);drawCal();};
@@ -917,8 +965,8 @@ function drawCal(){
 
 /* ---- kegel trainer ---- */
 const KORDER=['Fun','Easy','Medium','Difficult','Extra'];
-const KDIFF={Fun:{total:60,hold:5,reps:4,pulses:8},Easy:{total:90,hold:10,reps:6,pulses:10},Medium:{total:150,hold:20,reps:8,pulses:14},Difficult:{total:240,hold:40,reps:10,pulses:18},Extra:{total:300,hold:60,reps:12,pulses:24}};
-function kegelCard(){return '<button class="gcard play" id="g-keg"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Kegel Trainer</div><div class="gs">Squeeze \u00b7 hold \u00b7 pulse \u00b7 reverse</div></div><div class="chev">\u203a</div></button>';}
+const KDIFF={Fun:{total:60,hold:5,reps:4,pulses:6},Easy:{total:90,hold:10,reps:6,pulses:10},Medium:{total:150,hold:20,reps:8,pulses:14},Difficult:{total:240,hold:40,reps:10,pulses:18},Extra:{total:300,hold:60,reps:12,pulses:24}};
+function kegelCard(){return '<button class="gcard play game-theme theme-kegel" id="g-keg"><div class="gico">\uD83C\uDF51</div><div class="gtxt"><div class="gt">Kegel Trainer</div><div class="gs">Squeeze \u00b7 hold \u00b7 pulse \u00b7 reverse</div></div><div class="chev">\u203a</div></button>';}
 function fmtDE(t){ if(!t)return ''; try{return new Date(t).toLocaleString('de-DE',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){return new Date(t).toLocaleString();} }
 function kegelBoardHTML(bests){
   const arr=Object.values(bests||{}).sort((a,b)=>(b.score||0)-(a.score||0));
@@ -928,7 +976,7 @@ function kegelBoardHTML(bests){
 }
 async function renderKegel(){
   view={screen:"kegel",dayId:null}; clearSubs(); clearGameTimers();
-  app.innerHTML='<div class="screen"><button class="back" id="kback">\u2039 Games</button><div class="shead"><h2>Kegel Trainer</h2></div>'+
+  app.innerHTML='<div class="screen game-theme theme-kegel"><button class="back" id="kback">\u2039 Games</button><div class="shead"><h2>Kegel Trainer</h2></div>'+
     '<p class="kintro">Pick a level. You\u2019ll be guided through squeezes, at least one long hold, and quick pulses \u2014 the final 20s is always reverse-kegel relaxation.</p>'+
     '<div class="klevels">'+KORDER.map(d=>'<button class="klev" data-d="'+d+'" style="animation-delay:'+(KORDER.indexOf(d)*0.05)+'s"><b>'+d+'</b><span>'+(Math.round(KDIFF[d].total/60*10)/10)+' min \u00b7 '+KDIFF[d].hold+'s hold</span></button>').join('')+'</div>'+
     '<div id="kbest"></div></div>';
@@ -938,28 +986,31 @@ async function renderKegel(){
   if(el)el.innerHTML='<div class="lb"><div class="lb-h">Leaderboard</div>'+kegelBoardHTML(bests)+'</div>';
 }
 function buildRoutine(d){
-  const c=KDIFF[d];const ph=[];ph.push({t:'relax',l:'Get ready \u2014 breathe',s:5});
+  const c=KDIFF[d],ph=[];ph.push({t:'relax',l:'Get ready \u2014 breathe',s:3});
   for(let i=0;i<c.reps;i++){ph.push({t:'squeeze',l:'Squeeze',s:2});ph.push({t:'release',l:'Let go',s:2});}
-  ph.push({t:'prep',l:'Long hold next',s:2});ph.push({t:'hold',l:'Hold the squeeze',s:c.hold});ph.push({t:'release',l:'Release slowly',s:4});
+  ph.push({t:'hold',l:'Long hold \u2014 keep breathing',s:c.hold});ph.push({t:'release',l:'Release slowly',s:3});
   for(let i=0;i<c.pulses;i++){ph.push({t:'pulse',l:'Pulse!',s:1});ph.push({t:'pulserel',l:'\u00b7',s:1});}
   let used=ph.reduce((a,b)=>a+b.s,0);const target=c.total-20;
-  while(used<target){if(target-used>=c.hold+6&&Math.random()<.5){ph.push({t:'prep',l:'Hold next',s:2});ph.push({t:'hold',l:'Hold the squeeze',s:c.hold});ph.push({t:'release',l:'Release',s:4});used+=c.hold+6;}else{ph.push({t:'squeeze',l:'Squeeze',s:2});ph.push({t:'release',l:'Let go',s:2});used+=4;}}
+  while(used<target){const left=target-used;
+    if(left>=c.hold+5&&Math.random()<.45){ph.push({t:'prep',l:'Hold next',s:2});ph.push({t:'hold',l:'Hold the squeeze',s:c.hold});ph.push({t:'release',l:'Release',s:3});used+=c.hold+5;}
+    else if(left>=4){ph.push({t:'squeeze',l:'Squeeze',s:2});ph.push({t:'release',l:'Let go',s:2});used+=4;}
+    else{ph.push({t:'relax',l:'Breathe and reset',s:left});used+=left;}}
   ph.push({t:'reverse',l:'Reverse kegel \u2014 relax & gently bear down',s:20});
   return ph;
 }
 function startKegel(d){
   view={screen:"game",dayId:null}; clearGameTimers();
   const ph=buildRoutine(d);const total=ph.reduce((a,b)=>a+b.s,0);let idx=0,elapsed=0;
-  app.innerHTML='<div class="screen"><button class="back" id="kstop">\u2039 Stop</button><div class="kbar"><div class="kbarfill" id="kfill"></div></div><div class="korbwrap"><div class="kcritter" id="kcrit"></div><div class="korb" id="korb"><span id="korbtxt"></span></div></div><div class="kphase" id="kphase"></div><div class="kcount num" id="kcount"></div><div class="kbreathe">remember to breathe throughout</div><div class="ktag">'+d+'</div></div>';
+  app.innerHTML='<div class="screen game-theme theme-kegel"><button class="back" id="kstop">\u2039 Stop</button><div class="kbar"><div class="kbarfill" id="kfill"></div></div><div class="korbwrap"><div class="kcritter" id="kcrit"></div><div class="korb" id="korb"><span id="korbtxt"></span></div></div><div class="kphase" id="kphase"></div><div class="kcount num" id="kcount"></div><div class="kbreathe">remember to breathe throughout</div><div class="ktag">'+d+'</div></div>';
   document.getElementById('kstop').onclick=renderKegel;
   const orb=document.getElementById('korb'),otx=document.getElementById('korbtxt'),lab=document.getElementById('kphase'),cnt=document.getElementById('kcount'),fill=document.getElementById('kfill');
   function setOrb(p){
     let sc=1,col='var(--accent)',td=p.s;
     if(p.t==='squeeze'||p.t==='hold'||p.t==='prep'){sc=0.6;col='var(--accent)';td=(p.t==='hold'?0.6:0.7);}
-    else if(p.t==='release'){sc=1.15;col='#5A3A30';td=Math.min(2,p.s);}
+    else if(p.t==='release'){sc=1.15;col='var(--accent-dim)';td=Math.min(2,p.s);}
     else if(p.t==='relax'||p.t==='reverse'){sc=1.55;col='var(--done-dim)';td=1.4;}
     else if(p.t==='pulse'){sc=0.66;col='var(--accent)';td=0.18;}
-    else if(p.t==='pulserel'){sc=1.05;col='#5A3A30';td=0.18;}
+    else if(p.t==='pulserel'){sc=1.05;col='var(--accent-dim)';td=0.18;}
     orb.style.transition='transform '+td+'s ease, background '+td+'s ease';
     orb.style.transform='scale('+sc+')';orb.style.background=col;
     otx.textContent=(p.t==='hold'||p.t==='squeeze'||p.t==='pulse')?'SQUEEZE':(p.t==='reverse'||p.t==='relax')?'RELAX':(p.t==='release'||p.t==='pulserel')?'let go':'';
@@ -985,52 +1036,52 @@ function startKegel(d){
 }
 async function finishKegel(d){
   clearGameTimers(); sound('win');
-  try{const ref=doc(db,'games','kegel');const snap=await getDoc(ref);const data=snap.exists()?snap.data():{bests:{}};if(!data.bests)data.bests={};
-    const me=auth.currentUser?auth.currentUser.email:'me';const k=sanit(me);const prev=data.bests[k]?data.bests[k].score:0;
-    const hp=data.bests[k]?KORDER.indexOf(data.bests[k].hardest||'Fun'):-1;const hd=Math.max(hp,KORDER.indexOf(d));
-    const ex=data.bests[k]||{}; const hist=(ex.history||[]).concat([{d:d,t:Date.now()}]).slice(-40);
-    data.bests[k]={name:me,score:prev+1,hardest:KORDER[Math.max(0,hd)],last:{d:d,t:Date.now()},history:hist};await setDoc(ref,data,{merge:true});
+  try{const ref=doc(db,'games','kegel'),me=auth.currentUser?auth.currentUser.email:'me',k=sanit(me),now=Date.now();
+    await runTransaction(db,async tx=>{const snap=await tx.get(ref),data=snap.exists()?(snap.data()||{}):{},bests=Object.assign({},data.bests||{}),ex=bests[k]||{};
+      const prev=ex.score||0,hp=KORDER.indexOf(ex.hardest||'Fun'),hd=Math.max(hp,KORDER.indexOf(d)),hist=(ex.history||[]).concat([{d:d,t:now}]).slice(-40);
+      bests[k]={name:me,score:prev+1,hardest:KORDER[Math.max(0,hd)],last:{d:d,t:now},history:hist};tx.set(ref,{bests:bests},{merge:true});});
   }catch(e){console.warn(e);}
   const bests=await getBests('kegel');
-  app.innerHTML='<div class="screen"><div class="result"><div class="rscore">\u2713</div><div class="rcap">'+d+' session complete</div><div class="lb"><div class="lb-h">Sessions completed</div>'+bestsHTML(bests,false,'')+'</div><div class="racts"><button class="save" id="kagain">Again</button><button class="cancel" id="kdone">Back</button></div></div></div>';
+  app.innerHTML='<div class="screen game-theme theme-kegel"><div class="result"><div class="rscore">\u2713</div><div class="rcap">'+d+' session complete</div><div class="lb"><div class="lb-h">Sessions completed</div>'+bestsHTML(bests,false,'')+'</div><div class="racts"><button class="save" id="kagain">Again</button><button class="cancel" id="kdone">Back</button></div></div></div>';
   document.getElementById('kagain').onclick=()=>startKegel(d);
   document.getElementById('kdone').onclick=renderKegel;
 }
 
-function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString('de-DE',{weekday:'long',day:'numeric',month:'long'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
+function fmtNow(){ const d=new Date(); const hh=String(d.getHours()).padStart(2,'0'); const mm=String(d.getMinutes()).padStart(2,'0'); let day; try{day=d.toLocaleDateString(navigator.language||'en',{weekday:'long',day:'numeric',month:'long'});}catch(e){day=d.toDateString();} return day+' \u00b7 '+hh+':'+mm; }
 let clockStarted=false;
-function startClock(){ if(clockStarted)return; clockStarted=true; const tick=()=>{const el=document.getElementById('clockNow'); if(el)el.textContent=fmtNow();}; tick(); setInterval(tick,1000); }
+function startClock(){ if(clockStarted)return; clockStarted=true; const tick=()=>{const el=document.getElementById('clockNow'); if(el)el.textContent=fmtNow();}; tick(); setInterval(tick,30000); }
 let presenceStarted=false, presenceData={}, presenceErr='';
+const PRESENCE_ONLINE_MS=70000;
 function presenceLabel(){
   if(view.screen==='session'){const d=PROGRAM.find(x=>x.id===view.dayId);return 'Week '+WEEK+' \u00b7 '+(d?d.name:'Day '+view.dayId);}
   return ({home:'Home',games:'Games',game:'Playing a game',kegel:'Kegel Trainer',chat:'Chat',calendar:'Calendar'}[view.screen])||'In the app';
 }
 function startPresence(){
   if(presenceStarted)return; presenceStarted=true;
-  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
-  const beat=()=>{ setDoc(doc(db,'presence',myKey),{name:me,label:presenceLabel(),t:Date.now()})
+  const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me),presRef=doc(db,'presence',myKey);
+  const beat=()=>{ setDoc(presRef,{name:me,label:presenceLabel(),t:Date.now()})
     .then(()=>{ if(presenceErr){presenceErr='';drawPresence(myKey);} })
     .catch(e=>{ presenceErr=(e&&e.code)||'write failed'; drawPresence(myKey); }); };
-  beat(); setInterval(beat,3000);
-  deleteDoc(doc(db,'presence','state')).catch(()=>{});
-  document.addEventListener('visibilitychange',()=>{ if(!document.hidden)beat(); });
-  window.addEventListener('focus',beat);
-  onSnapshot(collection(db,'presence'),snap=>{ liveOn(true); presenceData={};
+  beat();accountInterval(beat,25000);
+  const onVisible=()=>{if(!document.hidden)beat();};document.addEventListener('visibilitychange',onVisible);window.addEventListener('focus',beat);
+  accountDisposers.push(()=>document.removeEventListener('visibilitychange',onVisible),()=>window.removeEventListener('focus',beat));
+  const recent=query(collection(db,'presence'),where('t','>=',Date.now()-86400000));
+  const unsub=onSnapshot(recent,snap=>{ liveOn(true); presenceData={};
     snap.forEach(d=>{ const v=d.data(); if(v && typeof v.t==='number' && v.name) presenceData[d.id]=v; });
     drawPresence(myKey); },e=>{ presenceErr=(e&&e.code)||'sync error'; drawPresence(myKey); });
-  setInterval(()=>drawPresence(myKey),3000);
+  accountDisposers.push(unsub,()=>deleteDoc(presRef).catch(()=>{}));accountInterval(()=>drawPresence(myKey),10000);
 }
 function drawPresence(myKey){
   const el=document.getElementById('presbar'); if(!el)return; el.style.display='flex';
   let other=null; for(const k in presenceData){ if(k!==myKey && (!other || (presenceData[k].t||0)>(other.t||0))) other=presenceData[k]; }
   let h='<span class="pchip"><span class="pdot on"></span><b>you</b></span>';
-  if(other){ const age=Date.now()-(other.t||0), online=age<60000, who=esc((other.name||'').split('@')[0]);
+  if(other){ const age=Date.now()-(other.t||0), online=age<PRESENCE_ONLINE_MS, who=esc((other.name||'').split('@')[0]);
     if(online) h+='<span class="pchip"><span class="pdot on"></span><b>'+who+'</b><span class="plbl">'+esc(other.label||'online')+'</span></span>';
     else{ const mins=Math.max(1,Math.round(age/60000));
       const when=mins<60?(mins+'m ago'):fmtDE(other.t);
       h+='<span class="pchip"><span class="pdot off"></span><b>'+who+'</b><span class="plbl">last seen '+when+'</span></span>'; }
   } else h+='<span class="pchip"><span class="pdot off"></span>waiting for partner\u2026</span>';
-  const oOnline=other && (Date.now()-(other.t||0))<60000;
+  const oOnline=other && (Date.now()-(other.t||0))<PRESENCE_ONLINE_MS;
   if(oOnline){ const cd=Math.ceil((splashCoolUntil-Date.now())/1000);
     h+='<button class="pchip psend" id="splashBtn">'+(cd>0?'\uD83D\uDCA6 '+cd+'s':'\uD83D\uDCA6 Splash')+'</button>'; }
   if(presenceErr)h+='<span class="pchip perr"><span class="pdot off"></span>'+esc(presenceErr)+'</span>';
@@ -1045,53 +1096,64 @@ async function startChatWatch(){
   if(chatWatchStarted)return; chatWatchStarted=true;
   const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
   try{const r=await getDoc(doc(db,'reads',myKey)); if(r.exists()&&r.data().chatT)lastReadChat=r.data().chatT;}catch(e){}
-  const qy=query(collection(db,'messages'),orderBy('t'),limit(400));
-  onSnapshot(qy,snap=>{ const arr=[]; snap.forEach(d=>arr.push(d.data())); allChat=arr;
+  const qy=query(collection(db,'messages'),orderBy('t'),limitToLast(400));
+  const unsub=onSnapshot(qy,snap=>{ const arr=[]; snap.forEach(d=>arr.push(Object.assign({_id:d.id},d.data()))); allChat=arr;
     const incoming=arr.filter(m=>m.e!==me);
     unreadChat=incoming.filter(m=>(m.t||0)>lastReadChat).length;
     const newestT=incoming.length?incoming[incoming.length-1].t:0;
     if(newestT>chatMaxSeen){ if(chatMaxSeen>0 && view.screen!=='chat'){ const last=incoming[incoming.length-1]; notify((last.e||'').split('@')[0], last.txt); } chatMaxSeen=newestT; }
-    if(view.screen==='chat')markChatRead(); else drawChatBadge();
+    if(view.screen==='chat'){appendChat(arr,me);markChatRead();}else drawChatBadge();
   },e=>console.warn('chatwatch',e));
+  accountDisposers.push(unsub);
 }
 
 /* ---- realtime tic-tac-toe ---- */
 const TWIN=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
 function tttWinner(b){ for(const l of TWIN){ if(b[l[0]]&&b[l[0]]===b[l[1]]&&b[l[1]]===b[l[2]])return b[l[0]]; } return b.every(x=>x)?'draw':''; }
+function normaliseTTT(raw){
+  const d=raw||{},old=d.players||{},cv=v=>v==='X'?'H':v==='O'?'E':v;
+  return {board:(Array.isArray(d.board)?d.board:Array(9).fill('')).map(cv),turn:cv(d.turn)||'H',winner:cv(d.winner)||'',players:{H:old.H||old.X||'',E:old.E||old.O||''},starter:d.starter||'',round:d.round||0};
+}
+function tttRole(players,email){return players.H===email?'H':players.E===email?'E':null;}
+async function claimTTTRole(ref,me){let claimed=null;
+  await runTransaction(db,async tx=>{const snap=await tx.get(ref),d=normaliseTTT(snap.exists()?snap.data():null),players=Object.assign({},d.players);claimed=tttRole(players,me);
+    if(!claimed)claimed=!players.H?'H':(!players.E&&players.H!==me?'E':null);if(!claimed)return;players[claimed]=me;
+    const first=!d.starter&&d.board.every(x=>!x),next={players:players,board:d.board,turn:d.turn,winner:d.winner,round:d.round};
+    if(first){next.starter=me;next.turn=claimed;}tx.set(ref,next,{merge:true});});return claimed;
+}
+async function startTTTRound(ref,me){
+  await runTransaction(db,async tx=>{const snap=await tx.get(ref),d=normaliseTTT(snap.exists()?snap.data():null),role=tttRole(d.players,me);if(!role)throw new Error('Only a seated player can start a round.');
+    tx.set(ref,{board:Array(9).fill(''),turn:role,winner:'',starter:me,round:(d.round||0)+1,players:d.players},{merge:true});});
+}
 function renderTTT(){
   view={screen:"game",dayId:null}; clearSubs(); clearGameTimers();
   const me=auth.currentUser?auth.currentUser.email:''; const ref=doc(db,'games','ttt'); let claimed=false;
-  app.innerHTML='<div class="screen"><button class="back" id="tback">\u2039 Games</button><div class="shead"><h2>Tic-Tac-Toe</h2></div><div class="tstatus" id="tstatus">Connecting\u2026</div><div class="ttt" id="ttt"></div><div class="racts"><button class="cancel" id="tnew">New game</button></div></div>';
+  app.innerHTML='<div class="screen game-theme theme-ttt"><button class="back" id="tback">\u2039 Games</button><div class="shead"><h2>Hamster vs Elephant</h2></div><div class="tttlegend" id="tttlegend"></div><div class="tstatus" id="tstatus" role="status" aria-live="polite">Connecting\u2026</div><div class="ttt" id="ttt"></div><div class="racts"><button class="save" id="tnew">New round \u2014 I start</button></div></div>';
   document.getElementById('tback').onclick=renderGames;
-  document.getElementById('tnew').onclick=()=>{ setDoc(ref,{board:Array(9).fill(''),turn:'X',winner:''},{merge:true}).catch(()=>{}); };
+  document.getElementById('tnew').onclick=async()=>{try{await startTTTRound(ref,me);}catch(e){const st=document.getElementById('tstatus');if(st)st.textContent=e.message||'Could not start the round.';}};
   const u=onSnapshot(ref,async snap=>{
-    let d=snap.exists()?snap.data():null;
-    if(!d){ d={board:Array(9).fill(''),turn:'X',winner:'',players:{}}; try{await setDoc(ref,d);}catch(e){} }
-    const players=d.players||{};
-    let myMark = players.X===me?'X':players.O===me?'O':null;
-    if(!myMark && !claimed){ claimed=true; const mark=!players.X?'X':(!players.O&&players.X!==me?'O':null);
-      if(mark){ const pu={}; pu[mark]=me; try{await setDoc(ref,{players:pu},{merge:true});}catch(e){} return; } }
-    drawTTT(d,myMark,me,ref);
+    const d=normaliseTTT(snap.exists()?snap.data():null);let myRole=tttRole(d.players,me);
+    if(!myRole&&!claimed){claimed=true;try{myRole=await claimTTTRole(ref,me);if(myRole)return;}catch(e){console.warn('ttt claim',e);}}
+    drawTTT(d,myRole,me,ref);
   },e=>console.warn('ttt',e));
   subs.push(u);
 }
-function drawTTT(d,myMark,me,ref){
-  const board=d.board||Array(9).fill(''),turn=d.turn||'X',winner=d.winner||'';
-  const sym=m=>m==='X'?'\uD83C\uDF51':m==='O'?'\uD83D\uDC18':'';
-  const st=document.getElementById('tstatus'),g=document.getElementById('ttt'); if(!g)return;
-  if(winner&&winner!==tttLastWin){tttLastWin=winner; if(winner==='draw')sound('tick'); else sound(winner===myMark?'win':'msg');} if(!winner)tttLastWin='';
-  let msg; if(!myMark)msg='Spectating \u2014 board is full'; else if(winner==='draw')msg='Draw!'; else if(winner)msg=(winner===myMark?'You win! ':'Partner wins ')+sym(winner); else msg=(turn===myMark?('Your move '+sym(myMark)):('Waiting for partner '+sym(turn)));
+function drawTTT(raw,myRole,me,ref){
+  const d=normaliseTTT(raw),board=d.board,turn=d.turn,winner=d.winner,players=d.players,ready=!!(players.H&&players.E),sym=m=>m==='H'?'\uD83D\uDC39':m==='E'?'\uD83D\uDC18':'';
+  const st=document.getElementById('tstatus'),g=document.getElementById('ttt'),legend=document.getElementById('tttlegend'); if(!g)return;
+  if(legend){const role=(mark,label)=>'<span class="tttrole '+(myRole===mark?'me':'')+'"><span class="animal">'+sym(mark)+'</span>'+label+': <b>'+esc(players[mark]?players[mark].split('@')[0]:'open')+'</b>'+(d.starter===players[mark]?' \u00b7 starts':'')+'</span>';legend.innerHTML=role('H','Hamster')+role('E','Elephant');}
+  if(winner&&winner!==tttLastWin){tttLastWin=winner; if(winner==='draw')sound('tick'); else sound(winner===myRole?'win':'msg');} if(!winner)tttLastWin='';
+  let msg;if(!myRole)msg='Spectating \u2014 both seats are taken';else if(!ready)msg='You are '+sym(myRole)+' \u2014 waiting for an opponent';else if(winner==='draw')msg='Draw!';else if(winner)msg=(winner===myRole?'You win! ':'Partner wins ')+sym(winner);else msg=(turn===myRole?('Your move '+sym(myRole)):('Waiting for '+sym(turn)));
   if(st)st.textContent=msg;
-  g.innerHTML=board.map((c,i)=>'<button class="tcell" data-i="'+i+'">'+sym(c)+'</button>').join('');
-  g.querySelectorAll('.tcell').forEach(b=>b.onclick=()=>{ const i=+b.dataset.i; if(winner||!myMark||turn!==myMark||board[i])return;
-    const nb=board.slice(); nb[i]=myMark; const w=tttWinner(nb);
-    setDoc(ref,{board:nb,turn:(myMark==='X'?'O':'X'),winner:w},{merge:true}).catch(()=>{}); });
+  g.innerHTML=board.map((c,i)=>{const blocked=winner||!ready||!myRole||turn!==myRole||c;return '<button class="tcell '+(c==='H'?'hamster':c==='E'?'elephant':'')+'" data-i="'+i+'" aria-label="Cell '+(i+1)+': '+(c==='H'?'Hamster':c==='E'?'Elephant':'empty')+'"'+(blocked?' disabled':'')+'>'+sym(c)+'</button>';}).join('');
+  g.querySelectorAll('.tcell').forEach(b=>b.onclick=async()=>{const i=+b.dataset.i;try{await runTransaction(db,async tx=>{const snap=await tx.get(ref),cur=normaliseTTT(snap.exists()?snap.data():null),role=tttRole(cur.players,me);
+        if(cur.winner||!cur.players.H||!cur.players.E||!role||cur.turn!==role||cur.board[i])return;const nb=cur.board.slice();nb[i]=role;tx.set(ref,{board:nb,turn:role==='H'?'E':'H',winner:tttWinner(nb),players:cur.players},{merge:true});});}catch(e){console.warn('ttt move',e);}});
 }
 /* ---- steady hold: release at exactly 10.00s by feel ---- */
 function playHold(){
   view={screen:"game",dayId:null}; clearSubs(); clearGameTimers();
   const TARGET=10000;
-  app.innerHTML='<div class="screen"><button class="back" id="hback">\u2039 Games</button><div class="shead"><h2>Steady Hold \u23F1\uFE0F</h2></div>'+
+  app.innerHTML='<div class="screen game-theme theme-hold"><button class="back" id="hback">\u2039 Games</button><div class="shead"><h2>Steady Hold \u23F1\uFE0F</h2></div>'+
     '<p class="kintro">Press and hold the pad. The count hides after 3 seconds \u2014 release when you feel exactly <b>10.00s</b> has passed. Smallest deviation wins.</p>'+
     '<button class="holdpad" id="hpad"><span class="hbig" id="hbig">Hold me</span><span class="hsm" id="hsm">press & keep holding</span></button>'+
     '<div id="hres"></div></div>';
@@ -1124,7 +1186,7 @@ function playHoldRandom(){
   view={screen:"game",dayId:null}; clearSubs(); clearGameTimers();
   const roll=()=>Math.round((3000+Math.random()*7000)/10)*10;
   let TARGET=roll();
-  app.innerHTML='<div class="screen"><button class="back" id="rhback">\u2039 Games</button><div class="shead"><h2>Random Hold \uD83C\uDFB2</h2></div>'+
+  app.innerHTML='<div class="screen game-theme theme-random"><button class="back" id="rhback">\u2039 Games</button><div class="shead"><h2>Random Hold \uD83C\uDFB2</h2></div>'+
     '<p class="kintro">A new target every try, anywhere from <b>3.00s</b> to <b>10.00s</b>. Press and hold \u2014 the count hides after 1.5s \u2014 release right on the number.</p>'+
     '<div class="tstatus" id="rh-t"></div>'+
     '<button class="holdpad" id="rh-pad"><span class="hbig" id="rh-big">Hold me</span><span class="hsm" id="rh-sm">press & keep holding</span></button>'+
@@ -1203,7 +1265,7 @@ function keyName(k){ return esc((k||'').split('_gmail')[0].split('_yahoo')[0].sp
 function startSplashWatch(){
   if(splashWatchStarted)return; splashWatchStarted=true;
   const me=auth.currentUser?auth.currentUser.email:''; const myKey=sanit(me);
-  onSnapshot(doc(db,'games','splash'),snap=>{
+  const unsub=onSnapshot(doc(db,'games','splash'),snap=>{
     const d=snap.exists()?(snap.data()||{}):{};
     splashCounts=d.counts||{};
     const ev=d.ev;
@@ -1212,16 +1274,15 @@ function startSplashWatch(){
       if(isNew && ev.from!==myKey) receiveSplash(ev,myKey);
     }
     const st=document.getElementById('splashTally'); if(st)st.innerHTML=splashTallyHTML(myKey);
-  },e=>console.warn('splash',e));
+  },e=>console.warn('splash',e));accountDisposers.push(unsub);
 }
-function receiveSplash(ev,myKey){
+async function receiveSplash(ev,myKey){
   const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!reduce)bigSplash(document.body);
   if(navigator.vibrate)navigator.vibrate([70,40,90]);
   sound('pop');
   splashToast('\uD83D\uDCA6 Splash from '+esc((ev.name||'').split('@')[0]||keyName(ev.from))+'!');
-  const upd={counts:{}}; upd.counts[myKey]=(splashCounts[myKey]||0)+1;
-  setDoc(doc(db,'games','splash'),upd,{merge:true}).catch(()=>{});
+  try{const ref=doc(db,'games','splash');await runTransaction(db,async tx=>{const snap=await tx.get(ref),d=snap.exists()?(snap.data()||{}):{},counts=Object.assign({},d.counts||{});counts[myKey]=(counts[myKey]||0)+1;tx.set(ref,{counts:counts},{merge:true});});}catch(e){console.warn('splash count',e);}
 }
 function sendSplash(){
   const now=Date.now(); if(now<splashCoolUntil)return;
@@ -1230,8 +1291,7 @@ function sendSplash(){
   setDoc(doc(db,'games','splash'),{ev:{from:myKey,name:me,t:now}},{merge:true})
     .then(()=>{ sound('tap'); splashToast('\uD83D\uDCA6 sent!'); })
     .catch(()=>{ splashCoolUntil=0; splashToast('couldn\u2019t send \u2014 try again'); });
-  const myK=sanit(me); void myK;
-  drawPresence(sanit(me));
+  drawPresence(myKey);
 }
 function splashToast(txt){
   const t=document.createElement('div'); t.className='stoast'; t.textContent=txt; document.body.appendChild(t);
@@ -1270,7 +1330,7 @@ function signInScreen(){
   app.innerHTML='<div class="center"><h2>Pelooty 🍑</h2><p>Private coaching log. Sign in to continue.</p><button class="gbtn" id="gin"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.3 9.14 4.75 12 4.75z"/></svg>Sign in with Google</button></div>';
   document.getElementById('gin').onclick=doSignIn;
 }
-onAuthStateChanged(auth,async user=>{ try{ if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); startChatWatch(); startSplashWatch(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
+onAuthStateChanged(auth,async user=>{ try{clearSubs();clearGameTimers();clearAccountServices();if(user){ document.getElementById('live').style.display=''; introSplash(); try{const ms=await getDoc(doc(db,'meta','app')); if(ms.exists()&&ms.data().week)WEEK=ms.data().week;}catch(e){} const wn=document.getElementById('wkNum'); if(wn)wn.textContent=WEEK; startClock(); startPresence(); startChatWatch(); startSplashWatch(); renderHome(); } else signInScreen(); }catch(err){ showFatal((err&&err.stack)||(err&&err.message)||err); } });
 </script>
 </body>
 </html>
