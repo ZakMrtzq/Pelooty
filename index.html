@@ -208,14 +208,16 @@
   .ex-subpanel .pnote+.pnote{margin-top:10px}
   .exdel{margin-top:14px;text-align:right}
   .exdel button{color:var(--accent2);font-size:12px;font-weight:700;opacity:.85}
-  .progress-card{padding:14px;border-radius:15px;background:linear-gradient(180deg,rgba(114,213,255,.07),rgba(17,23,32,.7));border:1px solid var(--line)}
-  .progress-title{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
-  .progress-title b{font-size:13px}
-  .progress-title span{display:block;font-size:10px;color:var(--muted);margin-top:3px;line-height:1.4}
+  .progress-card{padding:16px;border-radius:16px;background:linear-gradient(180deg,rgba(114,213,255,.07),rgba(17,23,32,.7));border:1px solid var(--line)}
+  .progress-title{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+  .progress-title b{font-size:14px}
+  .progress-title span{display:block;font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4}
   .progress-modes{display:flex;gap:3px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:10px;flex:0 0 auto}
   .progress-modes button{padding:6px 8px;border-radius:7px;font-size:10px;font-weight:750;color:var(--muted)}
   .progress-modes button.on{background:var(--card2);color:var(--accent)}
   .progress-loading,.progress-empty{min-height:118px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+  .progress-content{display:block;min-height:0}
+  .progress-overview{display:grid;gap:10px;align-items:stretch}
   .progress-chart{width:100%;overflow:hidden;border-radius:12px;background:rgba(5,10,16,.38)}
   .progress-chart svg{display:block;width:100%;height:auto;overflow:visible}
   .progress-grid{stroke:var(--line);stroke-width:1}
@@ -224,13 +226,14 @@
   .progress-bar{fill:var(--accent);opacity:.7;transform-origin:bottom;animation:barRise .5s cubic-bezier(.2,.8,.3,1) both}
   .progress-dot{fill:var(--bg);stroke:var(--accent);stroke-width:3}
   .progress-axis{fill:var(--muted);font-size:9px;font-weight:650}
-  .progress-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:9px}
-  .progress-stat{padding:8px 9px;border-radius:10px;background:var(--bg);border:1px solid var(--line);min-width:0}
+  .progress-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:0}
+  .progress-stat{padding:10px 11px;border-radius:11px;background:var(--bg);border:1px solid var(--line);min-width:0}
   .progress-stat span{display:block;font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
-  .progress-stat b{display:block;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .progress-stat b{display:block;font-size:13px;line-height:1.25;overflow:visible;text-overflow:clip;white-space:normal}
   .progress-stat b.up{color:var(--done)}
   .progress-stat b.down{color:#FF9A9A}
-  .progress-note{font-size:11px;color:var(--muted);line-height:1.5;margin-top:8px}
+  .progress-note{display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:11px;color:var(--muted);line-height:1.5;margin-top:11px;padding:10px 12px;border:1px solid var(--line);border-radius:11px;background:rgba(5,10,16,.28)}
+  .progress-note b{width:21px;height:21px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent);font-size:10px}
   .resistance-filter{display:flex;gap:6px;overflow-x:auto;padding:2px 0 9px}
   .resistance-filter button{flex:0 0 auto;font-size:9px;color:var(--muted);padding:6px 9px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:750}
   .resistance-filter button.on{color:var(--accent);border-color:var(--accent-dim);background:var(--accent-soft)}
@@ -239,6 +242,9 @@
   .pr-ladder{display:flex;gap:6px;overflow-x:auto}
   .pr-chip{flex:0 0 auto;font-size:9px;color:var(--muted);padding:6px 8px;border-radius:9px;background:var(--card);border:1px solid var(--line)}
   .pr-chip b{color:var(--ink);font-size:10px}
+  @media(min-width:640px){.progress-overview{grid-template-columns:minmax(0,1fr) 176px}.progress-summary{grid-template-columns:1fr;grid-template-rows:repeat(3,minmax(0,1fr))}.progress-stat{display:flex;flex-direction:column;justify-content:center}}
+  @media(max-width:639px){.progress-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media(max-width:480px){.progress-title{align-items:stretch;flex-direction:column}.progress-modes{width:100%}.progress-modes button{flex:1}.progress-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.progress-stat:first-child{grid-column:1/-1}.progress-note{grid-template-columns:1fr}.progress-card{padding:13px}}
   @keyframes barRise{from{opacity:0;transform:scaleY(.1)}to{opacity:.7;transform:scaleY(1)}}
   .addex{width:100%;border:1px dashed var(--line2);border-radius:var(--r);padding:15px;color:var(--muted);font-size:14px;font-weight:700;margin-bottom:12px;transition:all .15s}
   .addex:active{border-color:var(--accent);color:var(--accent);transform:scale(.985)}
@@ -378,6 +384,8 @@
   .theme-random{--accent:#FF8A65;--accent2:#FB7185;--accent-soft:rgba(255,138,101,.15);--accent-dim:#4C2B29;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(255,138,101,.24)}
   .theme-ttt{--accent:#F0B45B;--accent2:#79AFFF;--accent-soft:rgba(240,180,91,.15);--accent-dim:#44351F;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(121,175,255,.24)}
   .theme-reaction{--accent:#E8F56A;--accent2:#76E6C2;--accent-soft:rgba(232,245,106,.14);--accent-dim:#38421E;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(232,245,106,.22)}
+  .theme-wordle{--accent:#66D19E;--accent2:#E7C35B;--accent-soft:rgba(102,209,158,.14);--accent-dim:#285040;--grad:linear-gradient(135deg,var(--accent),#86E1B5);--game-glow:rgba(102,209,158,.22)}
+  .theme-rps{--accent:#8BB8FF;--accent2:#C6A7FF;--accent-soft:rgba(139,184,255,.14);--accent-dim:#2E4668;--grad:linear-gradient(135deg,var(--accent),var(--accent2));--game-glow:rgba(139,184,255,.24)}
   .gcard.game-theme{border-color:var(--accent-dim)}
   .gcard.game-theme .gico{background:var(--accent-soft);box-shadow:0 0 24px var(--game-glow)}
   .gcard.game-theme:active{border-color:var(--accent)}
@@ -391,6 +399,44 @@
   .tcell.hamster{background:linear-gradient(180deg,#3B3020,#241E17);border-color:#6A512C}
   .tcell.elephant{background:linear-gradient(180deg,#21334D,#182332);border-color:#34547A}
   .tcell:disabled{cursor:default}
+  .word-meta{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-6px auto 12px;max-width:340px;color:var(--muted);font-size:10px;letter-spacing:.09em;text-transform:uppercase}
+  .word-status{text-align:center;min-height:22px;font-size:13px;font-weight:750;margin-bottom:12px;color:var(--ink)}
+  .word-grid{display:grid;grid-template-rows:repeat(6,1fr);gap:6px;width:min(100%,330px);margin:0 auto 16px}
+  .word-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .word-tile{aspect-ratio:1;border-radius:10px;border:1px solid var(--line2);background:var(--card);display:grid;place-items:center;font-size:clamp(20px,7vw,30px);font-weight:850;text-transform:uppercase;transition:transform .16s,background .16s,border-color .16s;color:var(--ink)}
+  .word-tile.filled{border-color:#597082;background:var(--card2)}
+  .word-tile.correct,.word-key.correct{background:#347B5B;border-color:#55B985;color:#F7FFFB}
+  .word-tile.present,.word-key.present{background:#8B6A24;border-color:#D0A942;color:#FFF9EA}
+  .word-tile.absent,.word-key.absent{background:#252E38;border-color:#35414E;color:#83909C}
+  .word-entry{display:flex;gap:8px;width:min(100%,330px);margin:0 auto 12px}
+  .word-entry input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;text-transform:uppercase;letter-spacing:.22em;text-align:center;font-size:16px;font-weight:800}
+  .word-entry input:focus{outline:none;border-color:var(--accent)}
+  .word-entry button{padding:0 16px;border-radius:12px;background:var(--grad);color:#071116;font-weight:850}
+  .word-entry[hidden]{display:none}
+  .word-keyboard{display:flex;flex-direction:column;gap:6px;width:min(100%,480px);margin:0 auto}
+  .word-krow{display:flex;justify-content:center;gap:5px}
+  .word-key{height:42px;min-width:0;flex:1;border-radius:8px;background:var(--card2);border:1px solid var(--line);font-size:11px;font-weight:800;text-transform:uppercase;transition:transform .1s,background .15s}
+  .word-key:active{transform:scale(.91)}
+  .word-key.wide{flex:1.55;font-size:10px}
+  .word-peers{width:min(100%,380px);margin:17px auto 0;padding:13px 15px;border-radius:14px;background:var(--card);border:1px solid var(--line)}
+  .word-peer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:5px 0;font-size:12px;color:var(--muted)}
+  .word-peer b{color:var(--ink)}
+  .rps-score{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:10px;align-items:stretch;margin:8px auto 18px;max-width:430px}
+  .rps-player{padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--line);text-align:center;min-width:0}
+  .rps-player.me{border-color:var(--accent)}
+  .rps-player span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:var(--muted)}
+  .rps-player b{display:block;font-size:29px;margin-top:3px;color:var(--ink)}
+  .rps-vs{display:grid;place-items:center;color:var(--muted);font-size:10px;font-weight:850;letter-spacing:.12em}
+  .rps-choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;max-width:430px;margin:15px auto}
+  .rps-choice{min-height:112px;border-radius:17px;background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;transition:transform .12s,border-color .15s,opacity .15s}
+  .rps-choice:active:not(:disabled){transform:scale(.94);border-color:var(--accent)}
+  .rps-choice .rps-icon{font-size:36px}
+  .rps-choice .rps-label{font-size:11px;font-weight:800;color:var(--muted)}
+  .rps-choice.selected{border-color:var(--accent);background:var(--accent-soft);opacity:1}
+  .rps-choice:disabled:not(.selected){opacity:.42}
+  .rps-reveal{min-height:64px;display:flex;align-items:center;justify-content:center;gap:16px;margin:8px auto 0;padding:11px;border:1px solid var(--line);border-radius:14px;background:rgba(5,10,16,.28);font-size:12px;color:var(--muted);text-align:center;max-width:430px}
+  .rps-reveal b{font-size:31px;color:var(--ink)}
+  @media(max-width:390px){.word-key{height:39px;font-size:10px}.word-krow{gap:3px}.rps-choice{min-height:96px}.rps-choice .rps-icon{font-size:30px}}
   .syncstate{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
   .syncstate.saving{color:var(--accent)}
   .syncstate.error{color:#FF8A8A}
@@ -850,7 +896,7 @@ function linePath(points){return points.map((p,i)=>(i?'L ':'M ')+p.x.toFixed(1)+
 function metricText(value,model,mode){if(mode==='performance'&&model.kind==='weight')return value.toFixed(1)+' kg';if(mode==='workload'&&model.kind==='weight')return Math.round(value)+' kg\u00b7reps';return Math.round(value)+' reps';}
 function progressChartHTML(model,mode){
   mode=mode==='workload'?'workload':'performance';const points=model.points||[],filters=model.kind==='category'&&model.resistances.length>1?'<div class="resistance-filter">'+model.resistances.map((r,idx)=>'<button data-ri="'+idx+'" class="'+(r===model.resistance?'on':'')+'">'+esc(r)+'</button>').join('')+'</div>':'';
-  const ladder=model.ladder&&model.ladder.length?'<div class="pr-section"><div class="pr-title">Rep PRs by '+(model.kind==='weight'?'load':'resistance')+'</div><div class="pr-ladder">'+model.ladder.map(pr=>'<span class="pr-chip"><b>'+esc(pr.label)+'</b> \u00b7 '+pr.reps+' reps'+(pr.rir==null?'':' @'+pr.rir+' RIR')+'</span>').join('')+'</div></div>':'';
+  const ladder=model.ladder&&model.ladder.length?'<div class="pr-section"><div class="pr-title">Best reps at each '+(model.kind==='weight'?'load':'resistance')+'</div><div class="pr-ladder">'+model.ladder.map(pr=>'<span class="pr-chip"><b>'+esc(pr.label)+'</b> \u00b7 '+pr.reps+' reps'+(pr.rir==null?'':' @'+pr.rir+' RIR')+'</span>').join('')+'</div></div>':'';
   if(!points.length)return filters+'<div class="progress-empty">No comparable sets yet.<br>Log reps with a load or resistance to start.</div>'+ladder;
   const W=340,H=170,L=34,R=12,T=14,B=28,minW=points[0].week,maxW=points[points.length-1].week,span=Math.max(1,maxW-minW),values=points.map(p=>p[mode]),rawMax=Math.max(1,...values),pow=Math.pow(10,Math.floor(Math.log10(rawMax))),step=Math.max(.5,pow/2),yMax=Math.ceil(rawMax*1.08/step)*step,xFor=w=>points.length===1?(L+(W-R))/2:L+(w-minW)/span*(W-L-R),yFor=v=>T+(1-v/yMax)*(H-T-B);
   const plotted=points.map(p=>({x:xFor(p.week),y:yFor(p[mode])})),averaged=points.map((p,idx)=>{const slice=points.slice(Math.max(0,idx-2),idx+1),avg=slice.reduce((sum,row)=>sum+row[mode],0)/slice.length;return {x:xFor(p.week),y:yFor(avg)};}),latest=points[points.length-1],prev=points[points.length-2],delta=prev&&prev[mode]?((latest[mode]/prev[mode]-1)*100):null;
@@ -860,19 +906,19 @@ function progressChartHTML(model,mode){
   else marks='<path class="progress-average" d="'+linePath(averaged)+'"/><path class="progress-trend" d="'+linePath(plotted)+'"/>'+points.map(p=>'<circle class="progress-dot" cx="'+xFor(p.week)+'" cy="'+yFor(p[mode])+'" r="4"><title>Week '+p.week+' \u00b7 '+esc(metricText(p[mode],model,mode))+' \u00b7 '+esc(p.actual)+'</title></circle>').join('');
   const deltaText=delta==null?'\u2014':(delta>0?'+':'')+delta.toFixed(1)+'%',deltaClass=delta>0?'up':delta<0?'down':'',metricLabel=mode==='workload'?'Workload':(model.kind==='weight'?'Estimated strength':'Best set');
   const note=model.kind==='weight'?'Estimated 1RM compares changing loads using load \u00d7 reps; optional RIR refines the estimate. The dashed line is a 3-session average.':'Only '+esc(model.resistance)+' is compared with itself. Workload here means total reps at that exact resistance.';
-  return filters+'<div class="progress-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+metricLabel+' over the last 12 weeks">'+grids+marks+xlabels+'</svg></div>'+
-    '<div class="progress-summary"><div class="progress-stat"><span>'+metricLabel+'</span><b>'+metricText(latest[mode],model,mode)+'</b></div><div class="progress-stat"><span>Vs prior</span><b class="'+deltaClass+'">'+deltaText+'</b></div><div class="progress-stat"><span>Latest best set</span><b>'+esc(latest.actual)+'</b></div></div>'+
-    '<div class="progress-note">'+note+(points.length<2?' Add another session to establish a trend.':'')+'</div>'+ladder;
+  return filters+'<div class="progress-overview"><div class="progress-chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+metricLabel+' over the last 12 weeks">'+grids+marks+xlabels+'</svg></div>'+
+    '<div class="progress-summary"><div class="progress-stat"><span>'+metricLabel+'</span><b>'+metricText(latest[mode],model,mode)+'</b></div><div class="progress-stat"><span>Vs prior session</span><b class="'+deltaClass+'">'+deltaText+'</b></div><div class="progress-stat"><span>Latest best set</span><b>'+esc(latest.actual)+'</b></div></div></div>'+
+    '<div class="progress-note"><b aria-hidden="true">i</b><span>'+note+(points.length<2?' Add another session to establish a trend.':'')+'</span></div>'+ladder;
 }
 function renderExerciseProgress(host,model,mode,i,day,rows){
-  mode=mode==='workload'?'workload':'performance';host.innerHTML=progressChartHTML(model,mode);host.dataset.ready='1';host.dataset.mode=mode;
+  mode=mode==='workload'?'workload':'performance';host.className='progress-content';host.innerHTML=progressChartHTML(model,mode);host.dataset.ready='1';host.dataset.mode=mode;
   const modes=document.getElementById('prog-modes-'+i);if(modes)modes.querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.mode===mode);b.onclick=()=>renderExerciseProgress(host,model,b.dataset.mode,i,day,rows);});
   host.querySelectorAll('[data-ri]').forEach(b=>b.onclick=()=>{host.dataset.resistance=model.resistances[+b.dataset.ri];renderExerciseProgress(host,buildProgressModel(day,i,rows,host.dataset.resistance),mode,i,day,rows);});
 }
 async function drawExerciseProgress(day,i,mode,force){
   const host=document.getElementById('prog-'+i);if(!host||host.dataset.loading==='1'||(host.dataset.ready==='1'&&!force&&!mode))return;host.dataset.loading='1';
-  if(host.dataset.ready!=='1')host.innerHTML='<span>Loading the last 12 weeks\u2026</span>';
-  try{const rows=await loadDayHistory(day),liveHost=document.getElementById('prog-'+i);if(!liveHost)return;const model=buildProgressModel(day,i,rows,liveHost.dataset.resistance);renderExerciseProgress(liveHost,model,mode||liveHost.dataset.mode||'performance',i,day,rows);}catch(e){host.innerHTML='<div class="progress-empty">Progress could not be loaded.</div>';console.warn('progress',e);}finally{const liveHost=document.getElementById('prog-'+i);if(liveHost)delete liveHost.dataset.loading;}
+  if(host.dataset.ready!=='1'){host.className='progress-loading';host.innerHTML='<span>Loading the last 12 weeks\u2026</span>';}
+  try{const rows=await loadDayHistory(day),liveHost=document.getElementById('prog-'+i);if(!liveHost)return;const model=buildProgressModel(day,i,rows,liveHost.dataset.resistance);renderExerciseProgress(liveHost,model,mode||liveHost.dataset.mode||'performance',i,day,rows);}catch(e){host.className='progress-content';host.innerHTML='<div class="progress-empty">Progress could not be loaded.</div>';console.warn('progress',e);}finally{const liveHost=document.getElementById('prog-'+i);if(liveHost)delete liveHost.dataset.loading;}
 }
 
 let introShown=false;
@@ -976,17 +1022,21 @@ function renderGames(){
   app.innerHTML='<div class="screen"><button class="back" id="gback">\u2039 Home</button>'+
     '<div class="shead"><h2>Games \uD83C\uDF51</h2></div>'+
     '<p class="kintro" id="splashTally"></p>'+
+    '<button class="gcard play game-theme theme-wordle" id="g-wordle"><div class="gico">W</div><div class="gtxt"><div class="gt">Daily Wordle</div><div class="gs">One shared five-letter word every day</div></div><div class="chev">\u203a</div></button>'+
     kegelCard()+
     '<button class="gcard play game-theme theme-hold" id="g-hold"><div class="gico">\u23F1\uFE0F</div><div class="gtxt"><div class="gt">Steady Hold</div><div class="gs">Release at exactly 10s \u2014 by feel</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play game-theme theme-random" id="g-rhold"><div class="gico">\uD83C\uDFB2</div><div class="gtxt"><div class="gt">Random Hold</div><div class="gs">3\u201310s \u00b7 new target every try</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play game-theme theme-ttt" id="g-ttt"><div class="gico">\uD83D\uDC39</div><div class="gtxt"><div class="gt">Hamster vs Elephant</div><div class="gs">Live \u00b7 launcher plays first</div></div><div class="chev">\u203a</div></button>'+
+    '<button class="gcard play game-theme theme-rps" id="g-rps"><div class="gico">\u270A</div><div class="gtxt"><div class="gt">Rock Paper Scissors</div><div class="gs">Live duel \u00b7 first to three wins</div></div><div class="chev">\u203a</div></button>'+
     '<button class="gcard play game-theme theme-reaction" id="g-rxn"><div class="gico">\u26A1</div><div class="gtxt"><div class="gt">Reaction</div><div class="gs">Tap the instant it changes</div></div><div class="chev">\u203a</div></button>'+
     '</div>';
   document.getElementById('gback').onclick=renderHome;
+  document.getElementById('g-wordle').onclick=renderWordle;
   document.getElementById('g-keg').onclick=()=>renderKegel();
   document.getElementById('g-hold').onclick=playHold;
   document.getElementById('g-rhold').onclick=playHoldRandom;
   document.getElementById('g-ttt').onclick=renderTTT;
+  document.getElementById('g-rps').onclick=renderRPS;
   document.getElementById('g-rxn').onclick=playReaction;
   {const st=document.getElementById('splashTally'); if(st)st.innerHTML=splashTallyHTML(sanit(auth.currentUser?auth.currentUser.email:''));}
 }
@@ -1013,6 +1063,101 @@ function playReaction(){
       document.getElementById('rxn-lb').innerHTML='<div class="lb"><div class="lb-h">Best (fastest)</div>'+bestsHTML(bests,true,' ms')+'</div>';
     }
   };
+}
+
+/* ---------- daily Wordle ---------- */
+const WORDLE_WORDS=('about,above,abuse,actor,acute,admit,adopt,adore,adult,after,again,agent,agile,agree,ahead,alarm,album,alert,alike,alive,allow,alone,along,alter,amber,angel,anger,angle,apple,arena,argue,arise,armor,aroma,aside,asset,audio,avoid,awake,award,aware,baker,basic,beach,beard,beast,begin,below,bench,berry,birth,black,blade,blame,blank,blend,blind,block,bloom,board,boast,bonus,boost,brain,brake,brave,bread,break,brick,bride,brief,bring,broad,brown,brush,build,burst,cabin,cable,carry,catch,cause,chain,chair,charm,chart,chase,cheap,check,chest,chief,child,chill,choir,civic,claim,clean,clear,clerk,climb,clock,cloud,coach,coast,color,comic,coral,count,court,cover,craft,crane,cream,crime,cross,crowd,crown,curve,cycle,daily,dance,dream,drink,drive,earth,enjoy,event,faith,field,flame,focus,fresh,fruit,giant,grace,grand,grape,green,group,guide,happy,heart,heavy,honey,horse,house,human,ideal,judge,knife,laugh,learn,lemon,light,lucky,magic,metal,might,money,month,mouse,music,night,ocean,paint,panel,peace,peach,piano,pilot,place,plant,plate,point,power,pride,prize,queen,quick,quiet,reach,ready,right,river,round,route,score,shape,share,sharp,shirt,short,skill,smile,solid,sound,space,speed,spice,sport,stage,stand,start,stone,store,style,sugar,sweet,table,teach,tempo,tiger,toast,today,touch,tower,track,train,treat,trend,trust,value,video,watch,water,wheel,white,world,write,young').split(',');
+function wordleDayKey(){return new Date().toISOString().slice(0,10);}
+function wordleHash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function wordleAnswer(key){return WORDLE_WORDS[wordleHash('pelooty-word-v1|'+key)%WORDLE_WORDS.length].toUpperCase();}
+function wordleGrade(guess,answer){
+  const out=Array(5).fill('absent'),left={};
+  for(let i=0;i<5;i++){if(guess[i]===answer[i])out[i]='correct';else left[answer[i]]=(left[answer[i]]||0)+1;}
+  for(let i=0;i<5;i++){if(out[i]==='correct')continue;const c=guess[i];if(left[c]>0){out[i]='present';left[c]--;}}
+  return out;
+}
+function wordleKeyboardHTML(){
+  const rows=['QWERTYUIOP','ASDFGHJKL','ZXCVBNM'];
+  return rows.map((row,ri)=>'<div class="word-krow">'+(ri===2?'<button class="word-key wide" type="button" data-key="ENTER">Enter</button>':'')+row.split('').map(c=>'<button class="word-key" type="button" data-key="'+c+'">'+c+'</button>').join('')+(ri===2?'<button class="word-key wide" type="button" data-key="BACK">\u232B</button>':'')+'</div>').join('');
+}
+function wordlePeersHTML(players){
+  const rows=Object.values(players||{}).sort((a,b)=>(a.t||0)-(b.t||0));
+  if(!rows.length)return '<div class="word-peer"><span>No results yet</span><span>Be first</span></div>';
+  return rows.map(r=>{const label=r.solved?'Solved '+(r.guesses||[]).length+'/6':(r.finished?'Not solved':'Playing'),icon=r.solved?'\u2713':(r.finished?'\u2014':'\u2026');return '<div class="word-peer"><b>'+esc((r.name||'player').split('@')[0])+'</b><span>'+icon+' '+label+'</span></div>';}).join('');
+}
+function wordleBoardHTML(guesses,current,answer){
+  let html='';for(let r=0;r<6;r++){const saved=guesses[r]||'',letters=saved||(r===guesses.length?current:''),grade=saved?wordleGrade(saved,answer):[];html+='<div class="word-row">';for(let c=0;c<5;c++){const letter=letters[c]||'',cls=saved?(grade[c]||''):(letter?'filled':'');html+='<div class="word-tile '+cls+'">'+letter+'</div>';}html+='</div>';}
+  return html;
+}
+async function saveWordleState(ref,key,me,guesses,answer){
+  const k=sanit(me),won=guesses.includes(answer),finished=won||guesses.length>=6;
+  await runTransaction(db,async tx=>{const snap=await tx.get(ref),data=snap.exists()?(snap.data()||{}):{},players=Object.assign({},data.players||{});players[k]={name:me,guesses:guesses.slice(0,6),solved:won,finished:finished,t:Date.now()};tx.set(ref,{date:key,version:1,players:players},{merge:true});});
+}
+function renderWordle(){
+  view={screen:'game',dayId:null};clearSubs();clearGameTimers();
+  const me=auth.currentUser?auth.currentUser.email:'player',meKey=sanit(me),dayKey=wordleDayKey(),answer=wordleAnswer(dayKey),ref=doc(db,'games','wordle_'+dayKey.replace(/-/g,''));
+  let guesses=[],current='',players={},loaded=false,notice='';
+  const dayLabel=new Date(dayKey+'T12:00:00Z').toLocaleDateString(undefined,{weekday:'long',month:'short',day:'numeric'});
+  app.innerHTML='<div class="screen game-theme theme-wordle"><button class="back" id="wback">\u2039 Games</button><div class="shead"><h2>Daily Wordle</h2></div><div class="word-meta"><span>'+esc(dayLabel)+'</span><span id="word-count">0 / 6</span></div><div class="word-status" id="word-status" role="status" aria-live="polite">Loading today\u2019s game\u2026</div><div class="word-grid" id="word-grid"></div><form class="word-entry" id="word-form"><input id="word-input" maxlength="5" autocomplete="off" autocapitalize="characters" spellcheck="false" aria-label="Five-letter guess" placeholder="TYPE A WORD"><button type="submit">Enter</button></form><div class="word-keyboard" id="word-keyboard">'+wordleKeyboardHTML()+'</div><div class="word-peers"><div class="lb-h">Today</div><div id="word-peers"></div></div></div>';
+  document.getElementById('wback').onclick=renderGames;
+  const grid=document.getElementById('word-grid'),status=document.getElementById('word-status'),count=document.getElementById('word-count'),form=document.getElementById('word-form'),input=document.getElementById('word-input'),keyboard=document.getElementById('word-keyboard'),peerHost=document.getElementById('word-peers');
+  function finished(){return guesses.includes(answer)||guesses.length>=6;}
+  function draw(){
+    const won=guesses.includes(answer),done=finished(),keyState={},rank={absent:1,present:2,correct:3};
+    guesses.forEach(g=>wordleGrade(g,answer).forEach((s,i)=>{const c=g[i];if(!keyState[c]||rank[s]>rank[keyState[c]])keyState[c]=s;}));
+    grid.innerHTML=wordleBoardHTML(guesses,current,answer);count.textContent=guesses.length+' / 6';input.value=current;form.hidden=done;
+    keyboard.querySelectorAll('[data-key]').forEach(b=>{const k=b.dataset.key;b.className='word-key'+((k==='ENTER'||k==='BACK')?' wide':'')+(keyState[k]?' '+keyState[k]:'');b.disabled=done;});
+    if(notice)status.textContent=notice;else if(!loaded)status.textContent='Loading today\u2019s game\u2026';else if(won)status.textContent='Solved in '+guesses.length+'/6 \u00b7 '+answer;else if(done)status.textContent='The word was '+answer;else status.textContent='Guess today\u2019s five-letter word';
+    peerHost.innerHTML=wordlePeersHTML(players);
+  }
+  async function submitGuess(){
+    if(!loaded||finished())return;const guess=current.toUpperCase();
+    if(guess.length!==5){notice='Enter exactly five letters';draw();return;}
+    if(guesses.includes(guess)){notice='You already tried '+guess;draw();return;}
+    guesses.push(guess);current='';notice=guess===answer?'Solved in '+guesses.length+'/6 \u00b7 '+answer:(guesses.length===6?'The word was '+answer:'');draw();sound(guess===answer?'success':'tick');
+    try{await saveWordleState(ref,dayKey,me,guesses,answer);}catch(e){notice='Saved on this screen, but sync failed';draw();}
+  }
+  input.oninput=()=>{current=input.value.toUpperCase().replace(/[^A-Z]/g,'').slice(0,5);notice='';draw();};
+  form.onsubmit=e=>{e.preventDefault();submitGuess();};
+  keyboard.querySelectorAll('[data-key]').forEach(b=>b.onclick=()=>{const k=b.dataset.key;notice='';if(k==='ENTER')submitGuess();else if(k==='BACK')current=current.slice(0,-1);else if(current.length<5)current+=k;draw();});
+  const u=onSnapshot(ref,snap=>{players=snap.exists()?((snap.data()||{}).players||{}):{};const mine=players[meKey];if(mine&&(!loaded||(mine.guesses||[]).length>guesses.length))guesses=(mine.guesses||[]).map(g=>String(g).toUpperCase()).slice(0,6);loaded=true;draw();},e=>{loaded=true;notice='Could not load shared results';draw();});
+  subs.push(u);draw();setTimeout(()=>{if(document.getElementById('word-input')&&!finished())input.focus();},0);
+}
+
+/* ---------- realtime Rock Paper Scissors ---------- */
+const RPS_MOVES={rock:{icon:'\u270A',label:'Rock'},paper:{icon:'\u270B',label:'Paper'},scissors:{icon:'\u270C\uFE0F',label:'Scissors'}};
+let rpsLastResult='';
+function normaliseRPS(raw){
+  const d=raw||{},players=d.players||{},moves=d.moves||{},score=d.score||{},valid=m=>RPS_MOVES[m]?m:'';
+  return {players:{A:players.A||'',B:players.B||''},moves:{A:valid(moves.A),B:valid(moves.B)},score:{A:Math.max(0,+score.A||0),B:Math.max(0,+score.B||0)},round:Math.max(1,+d.round||1),match:Math.max(1,+d.match||1),result:['A','B','draw'].includes(d.result)?d.result:'',matchWinner:['A','B'].includes(d.matchWinner)?d.matchWinner:''};
+}
+function rpsRole(players,email){return players.A===email?'A':players.B===email?'B':null;}
+function rpsOutcome(a,b){if(a===b)return'draw';return(a==='rock'&&b==='scissors')||(a==='paper'&&b==='rock')||(a==='scissors'&&b==='paper')?'A':'B';}
+async function claimRPSRole(ref,me){let claimed=null;await runTransaction(db,async tx=>{const snap=await tx.get(ref),d=normaliseRPS(snap.exists()?snap.data():null),players=Object.assign({},d.players);claimed=rpsRole(players,me);if(!claimed)claimed=!players.A?'A':(!players.B&&players.A!==me?'B':null);if(!claimed)return;players[claimed]=me;tx.set(ref,{players:players,moves:d.moves,score:d.score,round:d.round,match:d.match,result:d.result,matchWinner:d.matchWinner},{merge:true});});return claimed;}
+async function playRPSMove(ref,me,move){
+  await runTransaction(db,async tx=>{const snap=await tx.get(ref),d=normaliseRPS(snap.exists()?snap.data():null),role=rpsRole(d.players,me);if(!role||!d.players.A||!d.players.B||d.result||d.matchWinner||d.moves[role]||!RPS_MOVES[move])return;const moves=Object.assign({},d.moves);moves[role]=move;let result='',matchWinner='',score=Object.assign({},d.score);if(moves.A&&moves.B){result=rpsOutcome(moves.A,moves.B);if(result!=='draw')score[result]++;if(score.A>=3)matchWinner='A';if(score.B>=3)matchWinner='B';}tx.set(ref,{players:d.players,moves:moves,score:score,round:d.round,match:d.match,result:result,matchWinner:matchWinner},{merge:true});});
+}
+async function advanceRPS(ref,me){
+  await runTransaction(db,async tx=>{const snap=await tx.get(ref),d=normaliseRPS(snap.exists()?snap.data():null),role=rpsRole(d.players,me);if(!role||!d.result)return;if(d.matchWinner)tx.set(ref,{players:d.players,moves:{A:'',B:''},score:{A:0,B:0},round:1,match:d.match+1,result:'',matchWinner:''},{merge:true});else tx.set(ref,{players:d.players,moves:{A:'',B:''},score:d.score,round:d.round+1,match:d.match,result:'',matchWinner:''},{merge:true});});
+}
+function renderRPS(){
+  view={screen:'game',dayId:null};clearSubs();clearGameTimers();
+  const me=auth.currentUser?auth.currentUser.email:'',ref=doc(db,'games','rps');let claimed=false;
+  app.innerHTML='<div class="screen game-theme theme-rps"><button class="back" id="rps-back">\u2039 Games</button><div class="shead"><h2>Rock Paper Scissors</h2></div><div class="rps-score" id="rps-score"></div><div class="tstatus" id="rps-status" role="status" aria-live="polite">Connecting\u2026</div><div class="rps-choices" id="rps-choices"></div><div class="rps-reveal" id="rps-reveal">First to three wins</div><div class="racts"><button class="save" id="rps-next" hidden>Next round</button></div></div>';
+  document.getElementById('rps-back').onclick=renderGames;
+  const u=onSnapshot(ref,async snap=>{const d=normaliseRPS(snap.exists()?snap.data():null);let role=rpsRole(d.players,me);if(!role&&!claimed){claimed=true;try{role=await claimRPSRole(ref,me);if(role)return;}catch(e){console.warn('rps claim',e);}}drawRPS(d,role,me,ref);},e=>{const st=document.getElementById('rps-status');if(st)st.textContent='Could not connect to the match.';});
+  subs.push(u);
+}
+function drawRPS(raw,myRole,me,ref){
+  const d=normaliseRPS(raw),ready=!!(d.players.A&&d.players.B),other=myRole==='A'?'B':'A',score=document.getElementById('rps-score'),status=document.getElementById('rps-status'),choices=document.getElementById('rps-choices'),reveal=document.getElementById('rps-reveal'),next=document.getElementById('rps-next');if(!choices)return;
+  const playerCard=role=>'<div class="rps-player '+(myRole===role?'me':'')+'"><span>'+esc(d.players[role]?(d.players[role].split('@')[0]):'Open seat')+'</span><b>'+d.score[role]+'</b></div>';
+  score.innerHTML=playerCard('A')+'<div class="rps-vs">VS<br>R'+d.round+'</div>'+playerCard('B');
+  if(!myRole)status.textContent='Spectating \u2014 both seats are taken';else if(!ready)status.textContent='Waiting for an opponent';else if(d.matchWinner)status.textContent=d.matchWinner===myRole?'You win the match!':'Partner wins the match';else if(d.result==='draw')status.textContent='Draw \u2014 replay the round';else if(d.result)status.textContent=d.result===myRole?'You win this round':'Partner wins this round';else if(d.moves[myRole])status.textContent='Choice locked \u00b7 waiting for partner';else status.textContent='Choose your move';
+  choices.innerHTML=Object.entries(RPS_MOVES).map(([key,m])=>{const selected=myRole&&d.moves[myRole]===key,blocked=!ready||!myRole||!!d.moves[myRole]||!!d.result||!!d.matchWinner;return '<button class="rps-choice '+(selected?'selected':'')+'" data-move="'+key+'"'+(blocked?' disabled':'')+'><span class="rps-icon">'+m.icon+'</span><span class="rps-label">'+m.label+'</span></button>';}).join('');
+  choices.querySelectorAll('[data-move]').forEach(b=>b.onclick=()=>playRPSMove(ref,me,b.dataset.move));
+  if(d.result&&d.moves.A&&d.moves.B){const mine=myRole?d.moves[myRole]:d.moves.A,theirs=myRole?d.moves[other]:d.moves.B;reveal.innerHTML='<b>'+RPS_MOVES[mine].icon+'</b><span>'+RPS_MOVES[mine].label+' vs '+RPS_MOVES[theirs].label+'</span><b>'+RPS_MOVES[theirs].icon+'</b>';}else if(myRole&&d.moves[myRole])reveal.textContent='Your move is hidden until both players choose';else reveal.textContent='Both choices are revealed together';
+  next.hidden=!d.result||!myRole;next.textContent=d.matchWinner?'New match':'Next round';next.onclick=()=>advanceRPS(ref,me);
+  const resultKey=d.result?(d.match+'-'+d.round+'-'+d.result):'';if(resultKey&&resultKey!==rpsLastResult){rpsLastResult=resultKey;sound(d.result===myRole?'success':d.result==='draw'?'tick':'msg');}if(!d.result)rpsLastResult='';
 }
 
 /* ---------- celebration ---------- */
