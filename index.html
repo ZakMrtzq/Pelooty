@@ -517,6 +517,8 @@ input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
 @media(max-width:400px){.top-actions{gap:4px}.top{flex-wrap:wrap}.brand{min-width:110px}.app-notice{margin:8px 14px}.timer-dock .tool-button{padding:6px 8px}}
 @media print{body>*{display:none!important}body>#printReport{display:block!important}html,body{background:white!important;color:#171717!important;max-width:none!important;padding:0!important}#printReport{font:11pt system-ui;color:#171717}#printReport h1{font-size:22pt}#printReport h2{font-size:15pt;margin:18pt 0 8pt}#printReport section{break-inside:avoid}#printReport table{border-collapse:collapse;width:100%;font-size:9pt}#printReport th,#printReport td{padding:6pt;border:1px solid #aaa;text-align:left;vertical-align:top}#printReport p{margin:8pt 0}}
 
+.logged-set{min-width:0}.set-record{margin:6px 0 0;padding-left:4px;color:var(--muted,#c5a9ba);font-size:12px;line-height:1.5}
+
 </style>
 </head>
 <body>
@@ -690,7 +692,22 @@ function loadAccountQueue(){
   drawSaveStatus();
 }
 function seedFromProgram(day){return {exercises:day.ex.map(e=>({id:uid(),name:e.n,ts:e.ts,tr:e.tr,load:e.load,unit:e.unit||'reps',sets:Array(e.ts).fill(0),cnote:'',anote:''}))};}
-function carry(prev){return {exercises:(prev.exercises||[]).map(e=>({...e,id:uid(),sets:Array(e.ts||1).fill(0),cnote:'',anote:''}))};}
+function structuredSet(s){return !!s&&typeof s==='object'&&!Array.isArray(s);}
+function setValue(s){const n=Number(structuredSet(s)?s.value:s);return Number.isFinite(n)?Math.max(0,n):0;}
+function withSetValue(s,value){return structuredSet(s)?{...s,value}:value;}
+function blankSet(e,index=0){
+  const template=e.sets?.[index]??e.sets?.at(-1);
+  if(structuredSet(template))return {...cloneData(template),value:0,rir:null};
+  return e.setSchema===2?{value:0,loadLabel:e.load||'',loadType:'',loadUnit:e.loadUnit||'',loadValue:e.loadValue??null,rir:null}:0;
+}
+function setLoadText(s,fallback=''){
+  if(!structuredSet(s))return fallback;
+  if(s.loadLabel)return String(s.loadLabel);
+  if(s.loadValue!=null&&Number.isFinite(Number(s.loadValue)))return s.loadValue+(s.loadUnit?' '+s.loadUnit:'');
+  return s.loadType==='bodyweight'?'BW':fallback;
+}
+function setRecordText(s){return String(setValue(s))+(structuredSet(s)?[setLoadText(s),s.rir!=null?'RIR '+s.rir:''].filter(Boolean).map(x=>' · '+x).join(''):'');}
+function carry(prev){return {...(prev.schemaVersion!=null?{schemaVersion:prev.schemaVersion}:{}),exercises:(prev.exercises||[]).map(e=>({...e,id:uid(),sets:Array.from({length:e.ts||1},(_,i)=>blankSet(e,i)),cnote:'',anote:''}))};}
 function shape(day,d){
   d=d?cloneData(d):{};
   if(!Array.isArray(d.exercises))d.exercises=seedFromProgram(day).exercises;
@@ -708,7 +725,14 @@ function diffSession(before,after){
       if(JSON.stringify(was[field])!==JSON.stringify(e[field]))ops.push({kind:'field',id:e.id,field,value:e[field]===undefined?null:cloneData(e[field])});
     }
     const prevSets=was.sets||[],nextSets=e.sets||[];
-    for(let i=0;i<nextSets.length;i++)if(prevSets[i]!==nextSets[i])ops.push({kind:'set',id:e.id,index:i,value:nextSets[i]});
+    for(let i=0;i<nextSets.length;i++){
+      if(JSON.stringify(prevSets[i])===JSON.stringify(nextSets[i]))continue;
+      if(structuredSet(prevSets[i])&&structuredSet(nextSets[i])){
+        for(const field of new Set([...Object.keys(prevSets[i]),...Object.keys(nextSets[i])])){
+          if(JSON.stringify(prevSets[i][field])!==JSON.stringify(nextSets[i][field]))ops.push({kind:'setField',id:e.id,index:i,field,value:nextSets[i][field]===undefined?null:cloneData(nextSets[i][field])});
+        }
+      }else ops.push({kind:'set',id:e.id,index:i,value:cloneData(nextSets[i])});
+    }
     if(nextSets.length<prevSets.length)ops.push({kind:'setLength',id:e.id,length:nextSets.length});
   }
   return ops;
@@ -720,7 +744,11 @@ function applySessionOps(data,ops){
     if(op.kind==='remove'){if(i>=0)next.exercises.splice(i,1);}
     else if(op.kind==='add'){if(i<0)next.exercises.push(cloneData(op.exercise));}
     else if(e&&op.kind==='field')e[op.field]=cloneData(op.value);
-    else if(e&&op.kind==='set'){if(!Array.isArray(e.sets))e.sets=[];while(e.sets.length<=op.index)e.sets.push(0);e.sets[op.index]=op.value;}
+    else if(e&&(op.kind==='set'||op.kind==='setField')){
+      if(!Array.isArray(e.sets))e.sets=[];while(e.sets.length<=op.index)e.sets.push(blankSet(e));
+      if(op.kind==='setField')e.sets[op.index]={...(structuredSet(e.sets[op.index])?e.sets[op.index]:{value:setValue(e.sets[op.index])}),[op.field]:cloneData(op.value)};
+      else e.sets[op.index]=structuredSet(op.value)?{...(structuredSet(e.sets[op.index])?e.sets[op.index]:{}),...cloneData(op.value)}:withSetValue(e.sets[op.index],op.value);
+    }
     else if(e&&op.kind==='setLength'&&e.sets)e.sets=e.sets.slice(0,op.length);
   }
   return next;
@@ -776,7 +804,7 @@ async function flushSession(k){
       const ref=dref(item.wk,item.id),snap=await tx.get(ref);
       const remote=shape(day,snap.exists()?snap.data():{exercises:[]});
       const next=applySessionOps(remote,batch);
-      tx.set(ref,{exercises:next.exercises,updatedAt:Date.now()},{merge:true});return next;
+      tx.set(ref,{exercises:next.exercises},{merge:true});return next;
     });
     if(epoch!==accountEpoch)return;
     const remaining=(sessionPending[k]?.ops||[]).filter(op=>op.seq>lastSeq);
@@ -793,9 +821,9 @@ async function flushSaves(){
   for(const [k,item]of Object.entries(sessionPending)){clearTimeout(saveT[k]);item.error='';}
   await Promise.all(Object.keys(sessionPending).map(flushSession));drawSaveStatus();
 }
-const vol=e=>(e.sets||[]).reduce((a,b)=>a+(+b||0),0);
+const vol=e=>(e.sets||[]).reduce((a,b)=>a+setValue(b),0);
 const tgt=e=>(e.ts||0)*(e.tr||0);
-const hit=e=>(e.sets||[]).length>=e.ts && (e.sets||[]).slice(0,e.ts).every(v=>v>=e.tr);
+const hit=e=>(e.sets||[]).length>=e.ts && (e.sets||[]).slice(0,e.ts).every(v=>setValue(v)>=e.tr);
 const doneCount=d=>(d.exercises||[]).filter(hit).length;
 const isSec=e=>e.unit==='sec';
 const suf=e=>isSec(e)?'s':'';
@@ -826,60 +854,80 @@ const previousWorkoutCache=new Map();
 let previousWorkout=null;
 
 function renderHome(){
+  if(!trainingWeekReady)return;
   const token=++workoutViewToken,wk=WEEK;
   view={screen:'home',dayId:null};clearSubs();clearGameTimers();setActiveNav('home');
   const email=auth.currentUser?.email||'';
-  app.innerHTML=`<div class="screen"><div class="page-heading"><div><p class="eyebrow">Your training</p><h2>Week ${wk}</h2></div><button class="text-btn" id="signout">Sign out</button></div><p class="account-name">${esc(email)}</p>
+  app.innerHTML=`<div class="screen"><div class="page-heading"><div><p class="eyebrow">Your training</p><h2>Week ${wk}</h2></div><button class="text-btn" id="signout">Sign out</button></div><p class="account-name">${esc(email)}</p><button class="text-btn" id="reloadSavedWorkouts">Reload saved workouts</button><p id="workoutReadStatus" class="tool-status" role="status">Loading saved workouts…</p>
     <section class="week-summary" aria-labelledby="summaryTitle"><div><p class="eyebrow" id="summaryTitle">This week</p><div class="summary-count"><strong id="weekCompleted">0</strong><span>of ${PROGRAM.length} sessions completed</span></div><div class="summary-track" aria-hidden="true"><span id="weekProgress"></span></div></div><button class="next-workout" id="nextWorkout"><span>Next workout</span><strong id="nextWorkoutName">Loading your week…</strong><span aria-hidden="true">→</span></button></section>
     <div class="section-heading"><h3>Choose a session</h3><span>Week ${wk}</span></div><div class="days">${PROGRAM.map((day,idx)=>dayCardHTML(day,idx)).join('')}</div>
     <section class="workout-tools" aria-label="Training tools"><button class="tool-card" id="progressBtn"><span aria-hidden="true">↗</span><strong>Progress</strong><span>Exercise history and trends</span></button><button class="tool-card" id="exportBtn"><span aria-hidden="true">↓</span><strong>Export workouts</strong><span>Download a CSV record</span></button><button class="tool-card" id="printBtn"><span aria-hidden="true">▤</span><strong>Weekly summary</strong><span>Print your programme</span></button></section></div>`;
   document.getElementById('signout').onclick=()=>safeSignOut();
+  document.getElementById('reloadSavedWorkouts').onclick=reloadSavedWorkouts;
   document.getElementById('progressBtn').onclick=()=>renderProgress();
   document.getElementById('exportBtn').onclick=()=>exportWorkouts();
   document.getElementById('printBtn').onclick=()=>printWeeklySummary();
   app.querySelectorAll('.day').forEach(b=>b.onclick=()=>openDay(+b.dataset.day));
   document.getElementById('nextWorkout').onclick=()=>{const day=nextPlannedDay();if(day)openDay(day.id);};
   startClock();drawChatBadge();updateWeeklySummary();refreshRail();
+  const waiting=new Set(PROGRAM.map(day=>day.id)),failures=new Map();
+  const readStatus=()=>{
+    const el=document.getElementById('workoutReadStatus');if(!el)return;
+    el.textContent=waiting.size?'Loading saved workouts…':failures.size?'Some workouts could not be read. Use Reload saved workouts to retry.':'Saved workouts loaded for Week '+wk+'.';
+    if(!waiting.size&&failures.size)setTxt('weekCompleted','—');
+  };
   PROGRAM.forEach(day=>{
-    const u=onSnapshot(dref(wk,day.id),snap=>{
+    const failed=error=>{
       if(token!==workoutViewToken||view.screen!=='home'||WEEK!==wk)return;
-      liveOn(true);
-      if(!snap.exists()&&(navigator.onLine||!state[key(wk,day.id)])){setTxt('dc-'+day.id,navigator.onLine?'0/'+day.ex.length:'Offline');setTxt('ec-'+day.id,navigator.onLine?day.ex.length+' exercises':'Open online to cache');return;}
-      const d=snap.exists()?acceptSession(wk,day.id,day,snap.data()):state[key(wk,day.id)];
-      state[key(wk,day.id)]=d;
+      waiting.delete(day.id);failures.set(day.id,error);liveOn(false);
+      setTxt('dc-'+day.id,'—');setTxt('ec-'+day.id,'Read failed');setTxt('cap-'+day.id,'retry');readStatus();
+    };
+    const u=onSnapshot(dref(wk,day.id),{includeMetadataChanges:true},snap=>{
+      if(token!==workoutViewToken||view.screen!=='home'||WEEK!==wk)return;
+      if(!snap.exists()&&snap.metadata?.fromCache&&navigator.onLine&&!state[key(wk,day.id)])return;
+      waiting.delete(day.id);failures.delete(day.id);liveOn(!snap.metadata?.fromCache);
+      if(!snap.exists()&&(navigator.onLine||!state[key(wk,day.id)])){
+        setTxt('dc-'+day.id,navigator.onLine?'0/'+day.ex.length:'Offline');setTxt('ec-'+day.id,navigator.onLine?'No saved session':'Open online to cache');setTxt('cap-'+day.id,'');readStatus();return;
+      }
+      const raw=snap.exists()?snap.data():state[key(wk,day.id)];
+      if(!Array.isArray(raw?.exercises)){failed({code:'unsupported-data',message:'Saved exercises have an invalid format.'});return;}
+      const d=snap.exists()?acceptSession(wk,day.id,day,raw):raw;state[key(wk,day.id)]=d;
       const completed=doneCount(d),count=d.exercises.length;
-      setTxt('dc-'+day.id,completed+'/'+count);setTxt('ec-'+day.id,count+' exercises');
-      const ring=document.getElementById('ring-'+day.id);
-      if(ring){ring.style.setProperty('--pct',Math.round(completed/Math.max(1,count)*100));ring.classList.toggle('full',count>0&&completed===count);}
-      updateWeeklySummary();refreshRail();
-    },err=>{if(token===workoutViewToken){liveOn(false);handleErr(err);}});
-    subs.push(u);
+      setTxt('dc-'+day.id,completed+'/'+count);setTxt('ec-'+day.id,count+' exercises');setTxt('cap-'+day.id,'done');
+      const ring=document.getElementById('ring-'+day.id);if(ring){ring.style.setProperty('--pct',Math.round(completed/Math.max(1,count)*100));ring.classList.toggle('full',count>0&&completed===count);}
+      updateWeeklySummary();refreshRail();readStatus();
+    },failed);subs.push(u);
   });
 }
 
 function dayCardHTML(day,idx=0){
   const t=day.type==='hyp'?'t-hyp':day.type==='neu'?'t-neu':'t-rest';
   const label=day.type==='hyp'?'Hypertrophy':day.type==='neu'?'Neural':'Rest';
-  return `<button class="day ${t}" data-day="${day.id}" style="animation-delay:${idx*.04}s"><span class="ring" id="ring-${day.id}" style="--pct:0"><span class="ix">D${day.id}</span></span><span class="body"><span class="nm">${esc(day.name)}</span><span class="sub"><span class="pill ${day.type}">${label}</span><span id="ec-${day.id}">${day.ex.length} exercises</span></span></span><span class="meta"><span class="big num" id="dc-${day.id}">0/${day.ex.length}</span><span class="cap">done</span></span><span class="chev" aria-hidden="true">›</span></button>`;
+  return `<button class="day ${t}" data-day="${day.id}" style="animation-delay:${idx*.04}s"><span class="ring" id="ring-${day.id}" style="--pct:0"><span class="ix">D${day.id}</span></span><span class="body"><span class="nm">${esc(day.name)}</span><span class="sub"><span class="pill ${day.type}">${label}</span><span id="ec-${day.id}">${day.ex.length} exercises</span></span></span><span class="meta"><span class="big num" id="dc-${day.id}">…</span><span class="cap" id="cap-${day.id}">loading</span></span><span class="chev" aria-hidden="true">›</span></button>`;
 }
 
 async function openDay(id){
+  if(!trainingWeekReady)return;
   const token=++workoutViewToken,wk=WEEK,day=PROGRAM.find(d=>d.id===id);
   if(!day)return;
   view={screen:'session',dayId:id};clearSubs();clearGameTimers();renderedIds='';previousWorkout=null;setActiveNav('session');
   app.innerHTML='<div class="screen"><p class="loading-state" role="status">Loading session…</p></div>';
-  try{await ensureDay(wk,id);}catch(e){if(token!==workoutViewToken)return;handleErr(e);if(e?.code==='permission-denied')return;if(!navigator.onLine&&!state[key(wk,id)]){app.innerHTML='<div class="screen"><button class="back" id="offlineBack">‹ Workouts</button><h2>No offline copy</h2><p class="loading-state">Open this session online once to make it available offline.</p></div>';document.getElementById('offlineBack').onclick=renderHome;return;}}
+  try{await ensureDay(wk,id);}catch(error){
+    if(token!==workoutViewToken)return;liveOn(false);workoutReadFailure(error,()=>openDay(id),'Could not load this workout');return;
+  }
   if(token!==workoutViewToken||view.screen!=='session'||view.dayId!==id||WEEK!==wk)return;
   if(!navigator.onLine&&state[key(wk,id)]){renderSession(day);renderedIds=state[key(wk,id)].exercises.map(e=>e.id).join(',');}
-  const u=onSnapshot(dref(wk,id),snap=>{
+  const u=onSnapshot(dref(wk,id),{includeMetadataChanges:true},snap=>{
     if(token!==workoutViewToken||view.screen!=='session'||view.dayId!==id||WEEK!==wk)return;
     liveOn(true);
-    const d=acceptSession(wk,id,day,snap.exists()?snap.data():(state[key(wk,day.id)]||seedFromProgram(day)));
+    if(!snap.exists()&&(navigator.onLine||!state[key(wk,id)])){if(snap.metadata?.fromCache&&navigator.onLine)return;workoutReadFailure({code:'missing-session',message:'This saved session could not be found.'},()=>openDay(id),'Could not load this workout');return;}
+    const raw=snap.exists()?snap.data():state[key(wk,id)];if(!Array.isArray(raw?.exercises)){workoutReadFailure({code:'unsupported-data',message:'Saved exercises have an invalid format.'},()=>openDay(id),'Could not load this workout');return;}
+    const d=acceptSession(wk,id,day,raw);
     state[key(wk,id)]=d;
     const ids=d.exercises.map(e=>e.id).join(',');
     if(ids!==renderedIds){renderSession(day);renderedIds=ids;}else refreshSession(day);
     refreshRail();
-  },err=>{if(token===workoutViewToken){liveOn(false);handleErr(err);}});
+  },error=>{if(token===workoutViewToken){liveOn(false);workoutReadFailure(error,()=>openDay(id),'Could not load this workout');}});
   subs.push(u);
   if(wk>1){
     const cacheKey=key(wk-1,id);
@@ -922,7 +970,7 @@ function renderSession(day){
     card.querySelector('[data-history]').onclick=()=>renderProgress(curEx(day,i)?.name||e.name);
     bindInput('en-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.name=val;patchEx(day,i);},day);
     bindInput('ld-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.load=val;patchEx(day,i);},day);
-    bindNum('es-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.ts=Math.min(50,Math.max(1,val));while(ex.sets.length<ex.ts)ex.sets.push(0);patchEx(day,i);drawSets(day,i);},day);
+    bindNum('es-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.ts=Math.min(50,Math.max(1,val));while(ex.sets.length<ex.ts)ex.sets.push(blankSet(ex,ex.sets.length));patchEx(day,i);drawSets(day,i);},day);
     bindNum('er-'+i,val=>{const ex=curEx(day,i);if(!ex)return;ex.tr=Math.min(9999,Math.max(1,val));patchEx(day,i);drawSets(day,i);},day);
     const su=document.getElementById('eu-'+i);su.onchange=()=>{const ex=curEx(day,i);if(!ex)return;ex.unit=su.value;setTxt('rl-'+i,isSec(ex)?'Seconds':'Reps');drawSets(day,i);patchEx(day,i);save(WEEK,day.id);};
     bindInput('loadValue-'+i,val=>{const ex=curEx(day,i);if(ex)ex.loadValue=val===''?null:Math.max(0,Number(val)||0);},day);
@@ -964,10 +1012,10 @@ function hintText(hi,v,t,word='reps'){if(hi)return '✓ Target completed. Review
 
 function drawSets(day,i){
   const e=curEx(day,i),wrap=document.getElementById('st-'+i);if(!wrap||!e)return;
-  const word=unitWord(e);wrap.innerHTML=(e.sets||[]).map((v,si)=>`<div class="set"><label class="sx" for="set-${i}-${si}">Set ${si+1}</label><button data-a="dec" data-s="${si}" aria-label="Decrease ${esc(e.name)} set ${si+1} ${word}">−</button><input id="set-${i}-${si}" class="vIn num${v>=e.tr?' ok':''}" type="number" inputmode="numeric" min="0" max="9999" data-s="${si}" value="${v}" aria-label="${esc(e.name)} set ${si+1} ${word}"/><button data-a="inc" data-s="${si}" aria-label="Increase ${esc(e.name)} set ${si+1} ${word}">+</button>${e.sets.length>e.ts?`<button class="rm" data-a="rm" data-s="${si}" aria-label="Remove ${esc(e.name)} set ${si+1}">×</button>`:''}${isSec(e)?'<span class="su">sec</span>':''}</div>`).join('')+'<button class="addset" data-a="add">+ Add set</button>';
-  wrap.querySelectorAll('.vIn').forEach(inp=>{inp.oninput=()=>{const ex=curEx(day,i);if(!ex||!inp.validity.valid)return;const si=+inp.dataset.s,was=hit(ex);ex.sets[si]=Math.min(9999,Math.max(0,parseInt(inp.value)||0));inp.classList.toggle('ok',ex.sets[si]>=ex.tr);patchEx(day,i);save(WEEK,day.id);if(!was&&hit(ex))celebrate();};});
+  const word=unitWord(e);wrap.innerHTML=(e.sets||[]).map((v,si)=>`<div class="logged-set"><div class="set"><label class="sx" for="set-${i}-${si}">Set ${si+1}</label><button data-a="dec" data-s="${si}" aria-label="Decrease ${esc(e.name)} set ${si+1} ${word}">−</button><input id="set-${i}-${si}" class="vIn num${setValue(v)>=e.tr?' ok':''}" type="number" inputmode="numeric" min="0" max="9999" data-s="${si}" value="${setValue(v)}" aria-label="${esc(e.name)} set ${si+1} ${word}"/><button data-a="inc" data-s="${si}" aria-label="Increase ${esc(e.name)} set ${si+1} ${word}">+</button>${e.sets.length>e.ts?`<button class="rm" data-a="rm" data-s="${si}" aria-label="Remove ${esc(e.name)} set ${si+1}">×</button>`:''}${isSec(e)?'<span class="su">sec</span>':''}</div>${structuredSet(v)?'<p class="set-record">'+esc([setLoadText(v),v.rir!=null?'RIR '+v.rir:''].filter(Boolean).join(' · '))+'</p>':''}</div>`).join('')+'<button class="addset" data-a="add">+ Add set</button>';
+  wrap.querySelectorAll('.vIn').forEach(inp=>{inp.oninput=()=>{const ex=curEx(day,i);if(!ex||!inp.validity.valid)return;const si=+inp.dataset.s,was=hit(ex);ex.sets[si]=withSetValue(ex.sets[si],Math.min(9999,Math.max(0,parseInt(inp.value)||0)));inp.classList.toggle('ok',setValue(ex.sets[si])>=ex.tr);patchEx(day,i);save(WEEK,day.id);if(!was&&hit(ex))celebrate();};});
   wrap.querySelectorAll('button').forEach(b=>b.onclick=()=>{const ex=curEx(day,i);if(!ex)return;const a=b.dataset.a,si=+b.dataset.s,was=hit(ex),step=stepOf(ex);
-    if(a==='inc'){ex.sets[si]=Math.min(9999,(+ex.sets[si]||0)+step);sound('tap');}else if(a==='dec'){ex.sets[si]=Math.max(0,(+ex.sets[si]||0)-step);sound('tick');}else if(a==='add'){if(ex.sets.length>=50)return;ex.sets.push(0);sound('pop');}else if(a==='rm'){ex.sets.splice(si,1);sound('tick');}
+    if(a==='inc'){ex.sets[si]=withSetValue(ex.sets[si],Math.min(9999,setValue(ex.sets[si])+step));sound('tap');}else if(a==='dec'){ex.sets[si]=withSetValue(ex.sets[si],Math.max(0,setValue(ex.sets[si])-step));sound('tick');}else if(a==='add'){if(ex.sets.length>=50)return;ex.sets.push(blankSet(ex,ex.sets.length));sound('pop');}else if(a==='rm'){ex.sets.splice(si,1);sound('tick');}
     save(WEEK,day.id);drawSets(day,i);patchEx(day,i);const focusTarget=wrap.querySelector('[data-a="'+a+'"][data-s="'+si+'"]')||wrap.querySelector('[data-a="add"]');if(focusTarget)focusTarget.focus({preventScroll:true});if(!was&&hit(ex))celebrate();
   });
 }
@@ -979,7 +1027,7 @@ function patchEx(day,i){
 function setTxt(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
 function updatePreviousComparisons(day){
   const current=state[key(WEEK,day.id)];if(!current)return;
-  current.exercises.forEach((e,i)=>{const el=document.getElementById('previous-'+i);if(!el)return;if(WEEK<=1){el.textContent='First programme week';return;}if(!previousWorkout)return;const prev=(previousWorkout.exercises||[]).find(x=>x.name.trim().toLowerCase()===e.name.trim().toLowerCase());el.textContent=prev?'Previous week: '+(prev.sets||[]).join(' / ')+' '+unitWord(prev)+' · '+(prev.load||'BW'):'No matching exercise in the previous week.';});
+  current.exercises.forEach((e,i)=>{const el=document.getElementById('previous-'+i);if(!el)return;if(WEEK<=1){el.textContent='First programme week';return;}if(!previousWorkout)return;const prev=(previousWorkout.exercises||[]).find(x=>x.name.trim().toLowerCase()===e.name.trim().toLowerCase());el.textContent=prev?'Previous week: '+(prev.sets||[]).map(setValue).join(' / ')+' '+unitWord(prev)+' · '+(prev.load||'BW'):'No matching exercise in the previous week.';});
 }
 
 let introShown=false;
@@ -1775,7 +1823,7 @@ async function printWeeklySummary(){
   }));
   if(owner!==(auth.currentUser?.uid||auth.currentUser?.email))return;
   let report=document.getElementById('printReport');if(report)report.remove();report=document.createElement('article');report.id='printReport';
-  report.innerHTML=`<h1>Pelooty · Week ${wk}</h1><p>${esc(new Date().toLocaleDateString(appPrefs.locale))} · ${esc(auth.currentUser.email||'')}</p>`+days.map(({day,data})=>`<section><h2>Day ${day.id} · ${esc(day.name)}</h2>${data.exercises?.length?'<table><thead><tr><th>Exercise</th><th>Load</th><th>Target</th><th>Logged sets</th><th>Notes</th></tr></thead><tbody>'+data.exercises.map(e=>`<tr><td>${esc(e.name)}</td><td>${esc(e.load||'')}</td><td>${e.ts} × ${e.tr} ${esc(e.unit||'reps')}</td><td>${(e.sets||[]).map(v=>+v||0).join(' / ')}</td><td>${esc([e.cnote,e.anote].filter(Boolean).join(' · '))}</td></tr>`).join('')+'</tbody></table>':'<p>No sets logged.</p>'}</section>`).join('');
+  report.innerHTML=`<h1>Pelooty · Week ${wk}</h1><p>${esc(new Date().toLocaleDateString(appPrefs.locale))} · ${esc(auth.currentUser.email||'')}</p>`+days.map(({day,data})=>`<section><h2>Day ${day.id} · ${esc(day.name)}</h2>${data.exercises?.length?'<table><thead><tr><th>Exercise</th><th>Load</th><th>Target</th><th>Logged sets</th><th>Notes</th></tr></thead><tbody>'+data.exercises.map(e=>`<tr><td>${esc(e.name)}</td><td>${esc(e.load||'')}</td><td>${e.ts} × ${e.tr} ${esc(e.unit||'reps')}</td><td>${(e.sets||[]).map(v=>esc(setRecordText(v))).join(' / ')}</td><td>${esc([e.cnote,e.anote].filter(Boolean).join(' · '))}</td></tr>`).join('')+'</tbody></table>':'<p>No sets logged.</p>'}</section>`).join('');
   document.body.appendChild(report);toolNotice('Weekly summary ready.');window.print();
 }
 function onSignedIn(){
@@ -2091,8 +2139,10 @@ function progressSessionRows(records){
     const week=+match[1],dayId=+match[2],day=PROGRAM.find(d=>d.id===dayId);
     for(const e of (Array.isArray(record.data?.exercises)?record.data.exercises:[])){
       if(!e||typeof e.name!=='string')continue;
-      const sets=(Array.isArray(e.sets)?e.sets:[]).map(x=>Math.max(0,Number(x)||0)),unit=e.unit==='sec'?'sec':'reps';
-      rows.push({week,dayId,day:day?day.name:'Day '+dayId,id:e.id,name:e.name,sets,total:sets.reduce((a,b)=>a+b,0),unit,load:typeof e.load==='string'?e.load:'',loadValue:Number.isFinite(Number(e.loadValue))&&Number(e.loadValue)>0?Number(e.loadValue):null,loadUnit:e.loadUnit||'',targetSets:Number(e.ts)||0,targetReps:Number(e.tr)||0,coachNote:e.cnote||'',athleteNote:e.anote||''});
+      const sets=(Array.isArray(e.sets)?e.sets:[]).map(setValue),unit=e.unit==='sec'?'sec':'reps';
+      const setLoads=(Array.isArray(e.sets)?e.sets:[]).filter(s=>structuredSet(s)&&['kg','lb'].includes(s.loadUnit)&&s.loadValue!=null&&Number.isFinite(Number(s.loadValue))&&Number(s.loadValue)>0);
+      const topLoad=setLoads.reduce((best,s)=>!best||Number(s.loadValue)*(s.loadUnit==='lb'?.45359237:1)>Number(best.loadValue)*(best.loadUnit==='lb'?.45359237:1)?s:best,null);
+      rows.push({week,dayId,day:day?day.name:'Day '+dayId,id:e.id,name:e.name,sets,setRecords:cloneData(Array.isArray(e.sets)?e.sets:[]),total:sets.reduce((a,b)=>a+b,0),unit,load:typeof e.load==='string'?e.load:'',loadValue:Number.isFinite(Number(e.loadValue))&&Number(e.loadValue)>0?Number(e.loadValue):topLoad?Number(topLoad.loadValue):null,loadUnit:e.loadUnit||topLoad?.loadUnit||'',targetSets:Number(e.ts)||0,targetReps:Number(e.tr)||0,coachNote:e.cnote||'',athleteNote:e.anote||''});
     }
   }
   return rows.sort((a,b)=>a.week-b.week||a.dayId-b.dayId||a.name.localeCompare(b.name));
@@ -2164,14 +2214,72 @@ async function exportWorkouts(existingRows){
     return;
   }
   if(owner!==measurementOwner())return;
-  const csv=[['Week','Day','Workout','Exercise','Set','Recorded value','Unit','Target sets','Target per set','Load description','Numerical load','Load unit','Coach note','Athlete note']];
-  for(const r of rows)r.sets.forEach((value,index)=>csv.push([r.week,r.dayId,r.day,r.name,index+1,value,r.unit,r.targetSets,r.targetReps,r.load,r.loadValue,r.loadUnit,r.coachNote,r.athleteNote]));
+  const csv=[['Week','Day','Workout','Exercise','Set','Recorded value','Unit','Target sets','Target per set','Load description','Numerical load','Load unit','Coach note','Athlete note','RIR']];
+  for(const r of rows)r.sets.forEach((value,index)=>{const set=r.setRecords?.[index];csv.push([r.week,r.dayId,r.day,r.name,index+1,value,r.unit,r.targetSets,r.targetReps,setLoadText(set,r.load),structuredSet(set)?set.loadValue:r.loadValue,structuredSet(set)?set.loadUnit:r.loadUnit,r.coachNote,r.athleteNote,structuredSet(set)?set.rir:null]);});
   return pelootyDownloadCSV('pelooty-workouts-'+ymd(new Date())+'.csv',csv,'progress-export-fallback');
 }
 
 initialiseShell();
 function esc(s){return (s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-function setWeek(w){if(!auth.currentUser)return;WEEK=Math.max(1,Math.min(999,Math.floor(w)));document.getElementById('wkNum').textContent=WEEK;try{localStorage.setItem('pelooty_week',String(WEEK));}catch(e){}if(view.screen==='session')openDay(view.dayId);else renderHome();}
+let trainingWeekReady=false,trainingLoadAttempt=0;
+function validTrainingWeek(value){const n=Number(value);return Number.isSafeInteger(n)&&n>=1?n:null;}
+function trainingWeekStorageKey(){return 'pelooty_training_week_'+encodeURIComponent(currentAccountKey());}
+function rememberTrainingWeek(wk){try{localStorage.setItem(trainingWeekStorageKey(),String(wk));}catch{}}
+function setWeek(w){
+  if(!auth.currentUser||!trainingWeekReady)return;
+  const next=validTrainingWeek(w);if(next==null)return;
+  const epoch=accountEpoch;WEEK=next;rememberTrainingWeek(next);document.getElementById('wkNum').textContent=WEEK;
+  setDoc(doc(db,'meta','app'),{week:next},{merge:true}).catch(error=>{if(epoch===accountEpoch)toolNotice('This week opened, but the shared training week could not be saved. '+(error?.code||'Please reconnect and retry.'),true);});
+  if(view.screen==='session')openDay(view.dayId);else renderHome();
+}
+function workoutReadFailure(error,retry,title='Could not load workouts'){
+  const code=String(error?.code||'read-failed');
+  const message=code==='permission-denied'?'This account could not read the saved workout data. Check account access and retry.':code==='offline-uncached'?'Connect to load the current training week.':'The saved workout data could not be read. Check your connection and retry.';
+  app.innerHTML='<div class="screen"><div class="center"><h2>'+esc(title)+'</h2><p>'+esc(message)+'</p><button class="tool-button primary" id="workoutReadRetry">Retry loading</button><button class="back" id="workoutReadSignOut">Sign out</button><details style="margin-top:18px"><summary>Technical details</summary><p style="margin-top:12px">'+esc(code+': '+(error?.message||'The read failed.'))+'</p></details></div></div>';
+  document.getElementById('workoutReadRetry').onclick=retry;
+  document.getElementById('workoutReadSignOut').onclick=safeSignOut;
+}
+async function restoreTrainingWeek(epoch){
+  const attempt=++trainingLoadAttempt;trainingWeekReady=false;
+  for(const id of ['nav','settingsBtn']){const el=document.getElementById(id);if(el)el.hidden=true;}
+  const controls=document.querySelector('.wk');if(controls)controls.hidden=true;
+  view={screen:'loading-workouts',dayId:null};
+  app.innerHTML='<div class="center"><h2>Loading your workouts…</h2><p role="status">Reading the saved training week.</p></div>';
+  try{
+    let wk;
+    if(navigator.onLine){
+      const metadata=await getDoc(doc(db,'meta','app'));
+      if(epoch!==accountEpoch||attempt!==trainingLoadAttempt)return false;
+      wk=metadata.exists()?validTrainingWeek(metadata.data().week):null;
+      if(metadata.exists()&&wk==null)throw Object.assign(new Error('The saved current week has an invalid value.'),{code:'invalid-training-week'});
+      if(wk==null)wk=20;
+    }else{
+      let remembered=null;try{remembered=validTrainingWeek(localStorage.getItem(trainingWeekStorageKey()));}catch{}
+      const cached=Object.keys(state).map(k=>/^w(\d+)-d\d+$/.exec(k)).filter(Boolean).map(m=>+m[1]);
+      wk=remembered|| (cached.length?Math.max(...cached):null);
+      if(wk==null)throw Object.assign(new Error('No saved training week is available on this device.'),{code:'offline-uncached'});
+    }
+    if(epoch!==accountEpoch||attempt!==trainingLoadAttempt)return false;
+    WEEK=wk;rememberTrainingWeek(wk);trainingWeekReady=true;
+    const label=document.getElementById('wkNum');if(label)label.textContent=WEEK;
+    if(controls)controls.hidden=false;return true;
+  }catch(error){
+    if(epoch===accountEpoch&&attempt===trainingLoadAttempt)workoutReadFailure(error,()=>startAccountWorkouts(auth.currentUser,epoch));
+    return false;
+  }
+}
+async function startAccountWorkouts(user,epoch){
+  if(!user||epoch!==accountEpoch)return;
+  const ready=await restoreTrainingWeek(epoch);if(!ready||epoch!==accountEpoch)return;
+  const live=document.getElementById('live');if(live)live.style.display='';
+  if(typeof onSignedIn==='function')onSignedIn(user);
+  startClock();startPresence();startChatWatch();startSplashWatch();renderHome();flushSaves();if(!reducedMotion())introSplash();
+}
+async function reloadSavedWorkouts(){
+  if(!auth.currentUser)return;
+  clearSubs();clearGameTimers();resetWorkoutView();
+  await startAccountWorkouts(auth.currentUser,accountEpoch);
+}
 document.getElementById('wkUp').onclick=()=>setWeek(WEEK+1);
 document.getElementById('wkDown').onclick=()=>setWeek(WEEK-1);
 
@@ -2199,7 +2307,7 @@ function signInScreen(){
 }
 
 function disposeAccount(){
-  persistSessionQueue();accountEpoch++;
+  persistSessionQueue();accountEpoch++;trainingWeekReady=false;trainingLoadAttempt++;
   clearSubs();clearGameTimers();
   for(const timer of Object.values(saveT))clearTimeout(timer);saveT={};
   for(const dispose of accountDisposers){try{dispose();}catch(e){}}accountDisposers=[];
@@ -2225,18 +2333,8 @@ onAuthStateChanged(auth,async user=>{
     if(!user){if(typeof onSignedOut==='function')onSignedOut();signInScreen();return;}
     loadAccountQueue();
     const savedDraft=readTrusted('chatdraft',null);if(savedDraft&&!chatDrafts.has(sessionOwner))chatDrafts.set(sessionOwner,savedDraft);
-    try{const remembered=Number(localStorage.getItem('pelooty_week'));if(remembered>0&&remembered<1000)WEEK=Math.floor(remembered);}catch(e){}
-    const week=document.querySelector('.wk');if(week)week.hidden=false;
-    const live=document.getElementById('live');if(live)live.style.display='';
-    if(typeof onSignedIn==='function')onSignedIn(user);
-    const weekLabel=document.getElementById('wkNum');if(weekLabel)weekLabel.textContent=WEEK;
-    startClock();startPresence();startChatWatch();startSplashWatch();renderHome();flushSaves();if(!reducedMotion())introSplash();
-    // Keep the user's local week selection responsive; use the shared default only on a first visit.
-    let hasLocalWeek=false;try{hasLocalWeek=!!localStorage.getItem('pelooty_week');}catch(e){}
-    if(!hasLocalWeek&&navigator.onLine){
-      try{const meta=await getDoc(doc(db,'meta','app'));if(epoch!==accountEpoch)return;if(meta.exists()&&Number(meta.data().week)>0){WEEK=Math.floor(Number(meta.data().week));if(weekLabel)weekLabel.textContent=WEEK;if(view.screen==='home')renderHome();}}catch(e){}
-    }
-  }catch(e){if(epoch===accountEpoch)showFatal(e?.message||'Unable to open the app.');}
+    await startAccountWorkouts(user,epoch);
+  }catch(error){if(epoch===accountEpoch)workoutReadFailure(error,()=>startAccountWorkouts(auth.currentUser,epoch));}
 });
 
 window.__pelootyStarted=true;
